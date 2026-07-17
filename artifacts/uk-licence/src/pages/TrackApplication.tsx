@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { Link } from 'wouter';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
@@ -10,10 +10,14 @@ import {
   getTrackApplicationQueryKey,
 } from '@workspace/api-client-react';
 import { formatDate } from '@/lib/utils';
-import { Search, AlertCircle, FileText, CheckCircle2, Clock, Truck, ShieldAlert } from 'lucide-react';
+import {
+  Search, AlertCircle, FileText, CheckCircle2, Clock,
+  Truck, ShieldAlert, Upload, Download, X, ImageIcon,
+} from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Skeleton } from '@/components/ui/skeleton';
 
+/* ─── status helpers ─── */
 const getStatusDisplay = (status: string) => {
   switch (status) {
     case 'registered':
@@ -29,6 +33,210 @@ const getStatusDisplay = (status: string) => {
   }
 };
 
+/* ─── watermark helper ─── */
+function applyWatermark(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d')!;
+
+      // Draw original image
+      ctx.drawImage(img, 0, 0);
+
+      // Watermark styling
+      const text = 'UK DVLA';
+      const fontSize = Math.max(28, Math.round(img.width / 14));
+      ctx.font = `bold ${fontSize}px Arial, sans-serif`;
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.55)';
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.18)';
+      ctx.lineWidth = fontSize / 16;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      // Tile diagonally
+      const step = fontSize * 4.5;
+      ctx.save();
+      ctx.rotate(-Math.PI / 5);
+      const diagonal = Math.sqrt(img.width ** 2 + img.height ** 2);
+      for (let y = -diagonal; y < diagonal * 1.5; y += step) {
+        for (let x = -diagonal; x < diagonal * 1.5; x += step) {
+          ctx.strokeText(text, x, y);
+          ctx.fillText(text, x, y);
+        }
+      }
+      ctx.restore();
+
+      URL.revokeObjectURL(url);
+      resolve(canvas.toDataURL('image/png'));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Image failed to load')); };
+    img.src = url;
+  });
+}
+
+/* ─── Watermark uploader component ─── */
+function WatermarkUploader() {
+  const [preview, setPreview] = useState<string | null>(null);
+  const [watermarked, setWatermarked] = useState<string | null>(null);
+  const [filename, setFilename] = useState('');
+  const [processing, setProcessing] = useState(false);
+  const [dragging, setDragging] = useState(false);
+  const [error, setError] = useState('');
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const ACCEPTED = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+
+  const processFile = useCallback(async (file: File) => {
+    if (!ACCEPTED.includes(file.type)) {
+      setError('Please upload a JPG, PNG, WEBP or GIF image.');
+      return;
+    }
+    setError('');
+    setFilename(file.name.replace(/\.[^.]+$/, ''));
+    setPreview(URL.createObjectURL(file));
+    setWatermarked(null);
+    setProcessing(true);
+    try {
+      const result = await applyWatermark(file);
+      setWatermarked(result);
+    } catch {
+      setError('Could not process the image. Please try a different file.');
+    } finally {
+      setProcessing(false);
+    }
+  }, []);
+
+  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) processFile(file);
+    e.target.value = '';
+  };
+
+  const onDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) processFile(file);
+  };
+
+  const onDownload = () => {
+    if (!watermarked) return;
+    const a = document.createElement('a');
+    a.href = watermarked;
+    a.download = `${filename || 'document'}-uk-dvla.png`;
+    a.click();
+  };
+
+  const onClear = () => {
+    setPreview(null);
+    setWatermarked(null);
+    setFilename('');
+    setError('');
+  };
+
+  return (
+    <Card className="border-2 border-slate-200 shadow-md overflow-hidden mt-10">
+      <div className="bg-slate-50 border-b border-slate-200 p-4 sm:px-6 flex items-center gap-3">
+        <ImageIcon className="text-gov-blue h-5 w-5" />
+        <h2 className="font-bold text-lg">Add UK DVLA watermark to a document</h2>
+      </div>
+      <CardContent className="p-6 space-y-6">
+        <p className="text-sm text-slate-600">
+          Upload an image of your document and we will stamp it with an official <strong>UK DVLA</strong> watermark.
+          The watermarked image can be downloaded for your records.
+        </p>
+
+        {/* Drop zone */}
+        {!preview && (
+          <div
+            onClick={() => fileRef.current?.click()}
+            onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+            onDragLeave={() => setDragging(false)}
+            onDrop={onDrop}
+            className={`border-2 border-dashed rounded-lg p-10 flex flex-col items-center justify-center gap-3 cursor-pointer transition-colors
+              ${dragging ? 'border-gov-blue bg-blue-50' : 'border-slate-300 hover:border-gov-blue hover:bg-slate-50'}`}
+          >
+            <Upload className={`h-10 w-10 ${dragging ? 'text-gov-blue' : 'text-slate-400'}`} />
+            <div className="text-center">
+              <p className="font-bold text-slate-700">Drag and drop an image here</p>
+              <p className="text-sm text-slate-500 mt-1">or click to browse — JPG, PNG, WEBP, GIF accepted</p>
+            </div>
+          </div>
+        )}
+
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp,image/gif"
+          onChange={onFileChange}
+          className="hidden"
+        />
+
+        {error && (
+          <div className="bg-red-50 border-l-4 border-red-600 p-4 text-red-800 text-sm font-medium">{error}</div>
+        )}
+
+        {/* Preview pane */}
+        {preview && (
+          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+            <div className="grid sm:grid-cols-2 gap-6">
+              {/* Original */}
+              <div>
+                <p className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Original</p>
+                <div className="border border-slate-200 rounded-lg overflow-hidden bg-slate-100 flex items-center justify-center min-h-[200px]">
+                  <img src={preview} alt="Original upload" className="max-w-full max-h-72 object-contain" />
+                </div>
+              </div>
+
+              {/* Watermarked */}
+              <div>
+                <p className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">With watermark</p>
+                <div className="border border-slate-200 rounded-lg overflow-hidden bg-slate-100 flex items-center justify-center min-h-[200px]">
+                  {processing ? (
+                    <div className="flex flex-col items-center gap-3 p-8">
+                      <div className="h-8 w-8 border-4 border-gov-blue border-t-transparent rounded-full animate-spin" />
+                      <p className="text-sm text-slate-500">Applying watermark…</p>
+                    </div>
+                  ) : watermarked ? (
+                    <img src={watermarked} alt="Watermarked" className="max-w-full max-h-72 object-contain" />
+                  ) : null}
+                </div>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex flex-wrap gap-3 pt-4">
+              {watermarked && (
+                <Button onClick={onDownload} className="bg-gov-green hover:bg-green-700 text-white font-bold gap-2">
+                  <Download className="h-4 w-4" />
+                  Download watermarked image
+                </Button>
+              )}
+              <Button
+                variant="outline"
+                onClick={() => fileRef.current?.click()}
+                className="border-gov-blue text-gov-blue hover:bg-blue-50 gap-2"
+              >
+                <Upload className="h-4 w-4" />
+                Upload a different image
+              </Button>
+              <Button variant="ghost" onClick={onClear} className="text-slate-500 hover:text-slate-700 gap-1">
+                <X className="h-4 w-4" />
+                Clear
+              </Button>
+            </div>
+          </motion.div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+/* ─── Main page ─── */
 export function TrackApplication() {
   const [trackingInput, setTrackingInput] = useState('');
   const [submittedCode, setSubmittedCode] = useState<string | null>(null);
@@ -40,15 +248,13 @@ export function TrackApplication() {
         enabled: !!submittedCode,
         retry: 1,
         queryKey: getTrackApplicationQueryKey(submittedCode ? { code: submittedCode } : undefined),
-      }
+      },
     }
   );
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (trackingInput.trim()) {
-      setSubmittedCode(trackingInput.trim().toUpperCase());
-    }
+    if (trackingInput.trim()) setSubmittedCode(trackingInput.trim().toUpperCase());
   };
 
   return (
@@ -57,9 +263,7 @@ export function TrackApplication() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
 
           <div className="mb-8">
-            <Link href="/" className="text-gov-blue hover:underline text-sm font-medium mb-4 inline-block">
-              Back
-            </Link>
+            <Link href="/" className="text-gov-blue hover:underline text-sm font-medium mb-4 inline-block">Back</Link>
             <h1 className="text-4xl sm:text-5xl font-black text-slate-900 mb-6 tracking-tight">
               Track your application
             </h1>
@@ -68,6 +272,7 @@ export function TrackApplication() {
             </p>
           </div>
 
+          {/* Tracking search card */}
           <Card className="border-2 border-slate-200 shadow-md overflow-hidden mb-12">
             <div className="bg-slate-50 border-b border-slate-200 p-4 sm:px-6 flex items-center gap-3">
               <Search className="text-gov-blue h-5 w-5" />
@@ -96,6 +301,7 @@ export function TrackApplication() {
             </CardContent>
           </Card>
 
+          {/* Tracking results */}
           <AnimatePresence mode="wait">
             {isLoading && (
               <motion.div key="loading" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
@@ -219,6 +425,10 @@ export function TrackApplication() {
               );
             })()}
           </AnimatePresence>
+
+          {/* Watermark uploader — always visible */}
+          <WatermarkUploader />
+
         </div>
       </div>
     </Layout>
