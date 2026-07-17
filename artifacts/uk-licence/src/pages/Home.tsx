@@ -186,7 +186,7 @@ export function Home() {
 
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
-                  href="/how-to-apply"
+                  href="/contact"
                   className={cn(buttonVariants({ size: 'lg' }), 'w-full sm:w-auto bg-gov-green hover:bg-green-700 text-white font-bold text-lg px-8 shadow-md inline-flex')}
                 >
                   Start now
