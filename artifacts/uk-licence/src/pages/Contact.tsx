@@ -293,27 +293,6 @@ export function Contact() {
             </div>
           </form>
 
-          {/* Alternative contact */}
-          <div className="mt-12 border-t border-slate-200 pt-8">
-            <h2 className="text-lg font-bold text-slate-900 mb-4">Other ways to contact us</h2>
-            <div className="grid sm:grid-cols-2 gap-6 text-sm text-slate-700">
-              <div className="flex gap-3">
-                <Phone className="h-5 w-5 text-gov-blue shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-bold text-slate-900">Telephone</p>
-                  <p>0300 790 6801</p>
-                  <p className="text-slate-500 text-xs mt-1">Monday to Friday, 8am to 7pm<br />Saturday, 8am to 2pm</p>
-                </div>
-              </div>
-              <div className="flex gap-3">
-                <Mail className="h-5 w-5 text-gov-blue shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-bold text-slate-900">Post</p>
-                  <p>DVLA<br />Swansea<br />SA99 1BU</p>
-                </div>
-              </div>
-            </div>
-          </div>
 
         </div>
       </div>

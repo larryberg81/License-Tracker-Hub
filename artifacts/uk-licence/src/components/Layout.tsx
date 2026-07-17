@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'wouter';
 import { cn } from '@/lib/utils';
-import { ShieldCheck, LogIn, ChevronRight, FileText, Search, BookOpen, Phone } from 'lucide-react';
+import { ShieldCheck, FileText, Search, BookOpen, Phone } from 'lucide-react';
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
@@ -14,10 +14,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
           <Link href="/" className="flex items-center gap-2 hover:underline focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 focus:ring-offset-gov-blue">
             <ShieldCheck className="h-8 w-8" />
             <span className="font-bold text-2xl tracking-tight">GOV.UK</span>
-          </Link>
-          <Link href="/admin" className="text-sm font-medium hover:underline flex items-center gap-1 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 focus:ring-offset-gov-blue">
-            <LogIn className="h-4 w-4" />
-            <span className="hidden sm:inline">Admin Login</span>
           </Link>
         </div>
       </header>
