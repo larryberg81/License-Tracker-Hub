@@ -25,13 +25,14 @@ function generateTrackingCode(): string {
   const L = "ABCDEFGHJKLMNPQRSTUVWXYZ";
   const N = "0123456789";
   const r = (set: string) => set[Math.floor(Math.random() * set.length)];
-  // Format: [5 letters][6 digits][2 letters][1 digit][2 letters]  e.g. KHANX902077SN9JU
+  // Format: [5 letters][6 digits][2 letters][1 digit][2 letters][2 digits]  e.g. KHANX902077SN9JU35
   return (
     r(L) + r(L) + r(L) + r(L) + r(L) +
     r(N) + r(N) + r(N) + r(N) + r(N) + r(N) +
     r(L) + r(L) +
     r(N) +
-    r(L) + r(L)
+    r(L) + r(L) +
+    r(N) + r(N)
   );
 }
 
