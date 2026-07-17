@@ -35,6 +35,10 @@ export interface ApplicationTracking {
   estimatedCompletion: string | null;
   /** @nullable */
   notes: string | null;
+  /** @nullable */
+  licenceImageFront: string | null;
+  /** @nullable */
+  licenceImageBack: string | null;
 }
 
 export type ApplicationLicenceType = typeof ApplicationLicenceType[keyof typeof ApplicationLicenceType];
@@ -76,6 +80,10 @@ export interface Application {
   notes: string | null;
   /** @nullable */
   estimatedCompletion: string | null;
+  /** @nullable */
+  licenceImageFront: string | null;
+  /** @nullable */
+  licenceImageBack: string | null;
   submittedAt: string;
   updatedAt: string;
 }
@@ -137,6 +145,8 @@ export interface ApplicationUpdate {
   phone?: string;
   licenceType?: ApplicationUpdateLicenceType;
   licenceCategory?: string;
+  licenceImageFront?: string;
+  licenceImageBack?: string;
 }
 
 export interface Stats {

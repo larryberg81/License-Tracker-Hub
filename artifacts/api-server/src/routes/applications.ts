@@ -90,6 +90,8 @@ router.get("/applications/track", async (req, res): Promise<void> => {
     submittedAt: app.submittedAt.toISOString(),
     estimatedCompletion: app.estimatedCompletion ?? null,
     notes: app.notes ?? null,
+    licenceImageFront: app.licenceImageFront ?? null,
+    licenceImageBack: app.licenceImageBack ?? null,
   });
   res.json(data);
 });
@@ -184,6 +186,8 @@ router.get("/admin/applications/:id", async (req, res): Promise<void> => {
     licenceCategory: a.licenceCategory ?? null,
     notes: a.notes ?? null,
     estimatedCompletion: a.estimatedCompletion ?? null,
+    licenceImageFront: a.licenceImageFront ?? null,
+    licenceImageBack: a.licenceImageBack ?? null,
     submittedAt: a.submittedAt.toISOString(),
     updatedAt: a.updatedAt.toISOString(),
   });
@@ -220,6 +224,8 @@ router.patch("/admin/applications/:id", async (req, res): Promise<void> => {
     licenceCategory: updated.licenceCategory ?? null,
     notes: updated.notes ?? null,
     estimatedCompletion: updated.estimatedCompletion ?? null,
+    licenceImageFront: updated.licenceImageFront ?? null,
+    licenceImageBack: updated.licenceImageBack ?? null,
     submittedAt: updated.submittedAt.toISOString(),
     updatedAt: updated.updatedAt.toISOString(),
   });

@@ -34,7 +34,9 @@ export const TrackApplicationResponse = zod.object({
   "statusDescription": zod.string(),
   "submittedAt": zod.string(),
   "estimatedCompletion": zod.string().nullable(),
-  "notes": zod.string().nullable()
+  "notes": zod.string().nullable(),
+  "licenceImageFront": zod.string().nullable(),
+  "licenceImageBack": zod.string().nullable()
 })
 
 
@@ -118,6 +120,8 @@ export const GetApplicationResponse = zod.object({
   "status": zod.enum(['registered', 'pending_payment', 'processing', 'processed']),
   "notes": zod.string().nullable(),
   "estimatedCompletion": zod.string().nullable(),
+  "licenceImageFront": zod.string().nullable(),
+  "licenceImageBack": zod.string().nullable(),
   "submittedAt": zod.string(),
   "updatedAt": zod.string()
 })
@@ -138,7 +142,9 @@ export const UpdateApplicationBody = zod.object({
   "email": zod.string().optional(),
   "phone": zod.string().optional(),
   "licenceType": zod.enum(['provisional', 'full_car', 'full_motorcycle', 'full_lorry', 'full_bus', 'full_minibus', 'international']).optional(),
-  "licenceCategory": zod.string().optional()
+  "licenceCategory": zod.string().optional(),
+  "licenceImageFront": zod.string().optional(),
+  "licenceImageBack": zod.string().optional()
 })
 
 export const UpdateApplicationResponse = zod.object({
@@ -153,6 +159,8 @@ export const UpdateApplicationResponse = zod.object({
   "status": zod.enum(['registered', 'pending_payment', 'processing', 'processed']),
   "notes": zod.string().nullable(),
   "estimatedCompletion": zod.string().nullable(),
+  "licenceImageFront": zod.string().nullable(),
+  "licenceImageBack": zod.string().nullable(),
   "submittedAt": zod.string(),
   "updatedAt": zod.string()
 })

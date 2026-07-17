@@ -31,6 +31,8 @@ export const applicationsTable = pgTable("applications", {
   status: applicationStatusEnum("status").notNull().default("registered"),
   notes: text("notes"),
   estimatedCompletion: text("estimated_completion"),
+  licenceImageFront: text("licence_image_front"),
+  licenceImageBack: text("licence_image_back"),
   submittedAt: timestamp("submitted_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
