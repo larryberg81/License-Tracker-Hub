@@ -160,9 +160,102 @@ const infoBoxes = [
 /* Component                                                            */
 /* ------------------------------------------------------------------ */
 
+/* ── Royal Coat of Arms SVG (DVLA / GOV.UK style) ── */
+function RoyalArms({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 120 130" className={className} aria-hidden="true" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* Crown */}
+      <rect x="36" y="8" width="48" height="9" rx="1.5" fill="#1a1a1a"/>
+      <circle cx="60" cy="6" r="4" fill="#1a1a1a"/>
+      <rect x="57.5" y="2" width="5" height="8" fill="#1a1a1a"/>
+      <rect x="54" y="4" width="12" height="4" fill="#1a1a1a"/>
+      <circle cx="36" cy="13" r="3.5" fill="#1a1a1a"/>
+      <rect x="33.5" y="4" width="5" height="9" fill="#1a1a1a"/>
+      <rect x="30" y="7" width="12" height="4" fill="#1a1a1a"/>
+      <circle cx="84" cy="13" r="3.5" fill="#1a1a1a"/>
+      <rect x="81.5" y="4" width="5" height="9" fill="#1a1a1a"/>
+      <rect x="78" y="7" width="12" height="4" fill="#1a1a1a"/>
+      <path d="M36 17 L36 13 L84 13 L84 17 Z" fill="#1a1a1a"/>
+
+      {/* Shield */}
+      <path d="M28 20 L28 72 Q28 90 60 100 Q92 90 92 72 L92 20 Z" fill="#f5f0e8" stroke="#1a1a1a" strokeWidth="2"/>
+      {/* Shield quarters — top divider */}
+      <line x1="60" y1="20" x2="60" y2="100" stroke="#1a1a1a" strokeWidth="1.5"/>
+      <line x1="28" y1="60" x2="92" y2="60" stroke="#1a1a1a" strokeWidth="1.5"/>
+
+      {/* Q1: England — 3 lions (simplified) */}
+      <rect x="31" y="22" width="26" height="36" rx="0" fill="#c8102e" opacity="0.85"/>
+      <text x="44" y="43" textAnchor="middle" fontSize="22" fill="#f5c518" fontWeight="bold">♛</text>
+
+      {/* Q2: Scotland — rampant lion */}
+      <rect x="62" y="22" width="26" height="36" rx="0" fill="#f5c518" opacity="0.9"/>
+      <text x="75" y="43" textAnchor="middle" fontSize="18" fill="#c8102e" fontWeight="bold">♞</text>
+
+      {/* Q3: Ireland — harp */}
+      <rect x="62" y="62" width="26" height="36" rx="0" fill="#c8102e" opacity="0.85"/>
+      <text x="75" y="83" textAnchor="middle" fontSize="18" fill="#f5c518" fontWeight="bold">♜</text>
+
+      {/* Q4: France (historical) */}
+      <rect x="31" y="62" width="26" height="36" rx="0" fill="#00338d" opacity="0.7"/>
+      <text x="44" y="83" textAnchor="middle" fontSize="14" fill="#f5c518" fontWeight="bold">⚜</text>
+
+      {/* Shield border overlay */}
+      <path d="M28 20 L28 72 Q28 90 60 100 Q92 90 92 72 L92 20 Z" fill="none" stroke="#1a1a1a" strokeWidth="2"/>
+
+      {/* Garter belt around shield */}
+      <path d="M22 60 Q22 95 60 108 Q98 95 98 60 L98 20 Q98 16 94 16 L26 16 Q22 16 22 20 Z" fill="none" stroke="#1a1a1a" strokeWidth="1" opacity="0.3"/>
+
+      {/* Left supporter — Lion */}
+      <ellipse cx="14" cy="72" rx="10" ry="14" fill="#c8a43a" opacity="0.9"/>
+      <circle cx="14" cy="58" r="7" fill="#c8a43a" opacity="0.9"/>
+      <path d="M8 55 Q6 50 10 48 Q14 46 18 50" fill="#c8a43a" opacity="0.9"/>
+      <path d="M4 72 Q4 85 14 88 Q24 85 24 72" fill="#c8a43a" opacity="0.9"/>
+
+      {/* Right supporter — Unicorn */}
+      <ellipse cx="106" cy="72" rx="10" ry="14" fill="#e8e8e8" opacity="0.9"/>
+      <circle cx="106" cy="58" r="7" fill="#e8e8e8" opacity="0.9"/>
+      <path d="M102 52 L106 44" stroke="#1a1a1a" strokeWidth="1.5" strokeLinecap="round"/>
+      <path d="M96 72 Q96 85 106 88 Q116 85 116 72" fill="#e8e8e8" opacity="0.9"/>
+
+      {/* Motto ribbon */}
+      <path d="M22 110 Q60 120 98 110" fill="none" stroke="#1a1a1a" strokeWidth="6" strokeLinecap="round"/>
+      <path d="M22 110 Q60 120 98 110" fill="none" stroke="#f5c518" strokeWidth="4" strokeLinecap="round"/>
+      <text x="60" y="113" textAnchor="middle" fontSize="4.5" fill="#1a1a1a" fontWeight="bold" letterSpacing="1">DIEU ET MON DROIT</text>
+    </svg>
+  );
+}
+
 export function Home() {
   return (
     <Layout>
+
+      {/* ── Breadcrumb ── */}
+      <div className="bg-white border-b border-slate-200">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl py-3">
+          <nav className="flex items-center gap-1.5 text-sm text-slate-600" aria-label="Breadcrumb">
+            <a href="https://www.gov.uk" className="text-slate-700 hover:underline">Home</a>
+            <ChevronRight className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+            <span className="text-slate-700 underline cursor-default">Organisations</span>
+          </nav>
+        </div>
+      </div>
+
+      {/* ── DVLA Organisation Banner ── */}
+      <div className="bg-white border-b border-slate-200">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl py-8">
+          <div className="flex items-start gap-5">
+            <div className="border-l-4 border-slate-800 pl-4 flex items-start gap-4">
+              <RoyalArms className="w-14 h-auto shrink-0 mt-0.5" />
+              <div>
+                <h1 className="text-2xl font-bold text-slate-900 leading-tight">
+                  Driver &amp; Vehicle Licensing<br />Agency
+                </h1>
+                <p className="text-sm text-slate-600 mt-1">Executive agency of the <span className="text-gov-blue hover:underline cursor-pointer">Department for Transport</span></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* ── Hero ── */}
       <div className="bg-white pb-12 pt-8 sm:py-16 border-b border-slate-200">

@@ -11,9 +11,35 @@ export function Layout({ children }: { children: React.ReactNode }) {
       {/* UK Gov Style Header */}
       <header className="bg-gov-blue text-white border-b-[10px] border-gov-green">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 hover:underline focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 focus:ring-offset-gov-blue">
-            <ShieldCheck className="h-8 w-8" />
-            <span className="font-bold text-2xl tracking-tight">GOV.UK</span>
+          <Link href="/" className="flex items-center gap-3 hover:underline focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 focus:ring-offset-gov-blue">
+            {/* GOV.UK Tudor Crown SVG */}
+            <svg aria-hidden="true" focusable="false" className="h-9 w-auto" viewBox="0 0 132 97" fill="none" xmlns="http://www.w3.org/2000/svg">
+              {/* Base / band */}
+              <rect x="14" y="74" width="104" height="14" rx="2" fill="white"/>
+              {/* Crown body */}
+              <path d="M14 74 L14 52 L33 52 L33 38 L44 52 L66 28 L88 52 L99 38 L99 52 L118 52 L118 74 Z" fill="white"/>
+              {/* Arch left */}
+              <path d="M14 52 Q14 30 33 30 Q44 30 44 52" fill="none" stroke="white" strokeWidth="0"/>
+              {/* Orb top centre */}
+              <circle cx="66" cy="24" r="7" fill="white"/>
+              <rect x="63" y="8" width="6" height="16" rx="1" fill="white"/>
+              <rect x="58" y="13" width="16" height="5" rx="1" fill="white"/>
+              {/* Left fleur */}
+              <circle cx="14" cy="52" r="6" fill="white"/>
+              <rect x="11" y="36" width="6" height="16" rx="1" fill="white"/>
+              <rect x="7" y="41" width="14" height="5" rx="1" fill="white"/>
+              {/* Right fleur */}
+              <circle cx="118" cy="52" r="6" fill="white"/>
+              <rect x="115" y="36" width="6" height="16" rx="1" fill="white"/>
+              <rect x="111" y="41" width="14" height="5" rx="1" fill="white"/>
+              {/* Jewels on band */}
+              <circle cx="32" cy="81" r="4" fill="#1d4ed8"/>
+              <circle cx="66" cy="81" r="4" fill="#1d4ed8"/>
+              <circle cx="100" cy="81" r="4" fill="#1d4ed8"/>
+            </svg>
+            <span className="font-black text-[28px] leading-none tracking-tight" style={{ fontFamily: 'Arial, sans-serif', letterSpacing: '-0.01em' }}>
+              GOV<span className="text-gov-green mx-0.5">·</span>UK
+            </span>
           </Link>
         </div>
       </header>
