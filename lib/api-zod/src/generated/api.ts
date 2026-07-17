@@ -74,6 +74,7 @@ export const createApplicationBodyFullNameMin = 2;
 
 
 export const CreateApplicationBody = zod.object({
+  "trackingCode": zod.string().min(1),
   "fullName": zod.string().min(createApplicationBodyFullNameMin),
   "email": zod.string().optional(),
   "phone": zod.string().optional(),

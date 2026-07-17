@@ -151,7 +151,7 @@ router.post("/admin/applications", async (req, res): Promise<void> => {
     res.status(400).json({ error: parsed.error.message });
     return;
   }
-  const trackingCode = generateTrackingCode();
+  const trackingCode = parsed.data.trackingCode.toUpperCase();
   const [created] = await db
     .insert(applicationsTable)
     .values({

@@ -150,6 +150,7 @@ export function NewApplication() {
   const createMutation = useCreateApplication();
 
   const [formData, setFormData] = useState({
+    trackingCode: '',
     fullName: '',
     email: '',
     phone: '',
@@ -171,6 +172,7 @@ export function NewApplication() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const payload = {
+      trackingCode: formData.trackingCode.toUpperCase(),
       fullName: formData.fullName,
       email: formData.email,
       dateOfBirth: formData.dateOfBirth,
@@ -213,6 +215,23 @@ export function NewApplication() {
           </CardHeader>
           <CardContent className="p-6 sm:p-8 bg-slate-50">
             <form onSubmit={handleSubmit} className="space-y-6">
+
+              {/* Tracking Code */}
+              <div className="space-y-2 pb-4 border-b border-slate-200">
+                <Label htmlFor="trackingCode" className="font-bold text-slate-700">
+                  Tracking Reference Number <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="trackingCode" name="trackingCode"
+                  value={formData.trackingCode}
+                  onChange={(e) => setFormData(prev => ({ ...prev, trackingCode: e.target.value.toUpperCase() }))}
+                  required
+                  className="bg-white font-mono tracking-widest text-lg"
+                  placeholder="e.g. KHANX902077SN9JU 35"
+                  maxLength={20}
+                />
+                <p className="text-xs text-slate-500">Format: 16 uppercase characters followed by a space and 2 digits — e.g. <span className="font-mono">KHANX902077SN9JU 35</span></p>
+              </div>
 
               {/* Applicant fields */}
               <div className="grid sm:grid-cols-2 gap-6">
