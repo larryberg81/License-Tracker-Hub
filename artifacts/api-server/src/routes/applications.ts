@@ -165,6 +165,8 @@ router.post("/admin/applications", async (req, res): Promise<void> => {
     licenceCategory: created.licenceCategory ?? null,
     notes: created.notes ?? null,
     estimatedCompletion: created.estimatedCompletion ?? null,
+    licenceImageFront: created.licenceImageFront ?? null,
+    licenceImageBack: created.licenceImageBack ?? null,
     submittedAt: created.submittedAt.toISOString(),
     updatedAt: created.updatedAt.toISOString(),
   });

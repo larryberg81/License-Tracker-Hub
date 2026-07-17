@@ -111,6 +111,8 @@ export interface ApplicationInput {
   licenceCategory?: string;
   notes?: string;
   estimatedCompletion?: string;
+  licenceImageFront?: string;
+  licenceImageBack?: string;
 }
 
 export type ApplicationUpdateStatus = typeof ApplicationUpdateStatus[keyof typeof ApplicationUpdateStatus];
