@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'wouter';
 import { cn } from '@/lib/utils';
-import { ShieldCheck, LogIn, ChevronRight, FileText, Search, BookOpen } from 'lucide-react';
+import { ShieldCheck, LogIn, ChevronRight, FileText, Search, BookOpen, Phone } from 'lucide-react';
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
@@ -31,6 +31,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
               { path: '/how-to-apply', label: 'How to Apply', icon: FileText },
               { path: '/licence-types', label: 'Licence Types', icon: BookOpen },
               { path: '/track', label: 'Track Application', icon: Search },
+              { path: '/contact', label: 'Contact', icon: Phone },
             ].map((route) => {
               const isActive = location === route.path;
               return (

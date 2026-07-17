@@ -6,6 +6,7 @@ import { Home } from './pages/Home';
 import { LicenceTypes } from './pages/LicenceTypes';
 import { HowToApply } from './pages/HowToApply';
 import { TrackApplication } from './pages/TrackApplication';
+import { Contact } from './pages/Contact';
 import { AdminLogin } from './pages/admin/Login';
 import { Dashboard } from './pages/admin/Dashboard';
 import { ApplicationList } from './pages/admin/ApplicationList';
@@ -34,6 +35,7 @@ function Router() {
       <Route path="/licence-types" component={LicenceTypes} />
       <Route path="/how-to-apply" component={HowToApply} />
       <Route path="/track" component={TrackApplication} />
+      <Route path="/contact" component={Contact} />
       <Route path="/admin" component={AdminLogin} />
       <Route path="/admin/dashboard" component={Dashboard} />
       <Route path="/admin/applications/new" component={NewApplication} />
