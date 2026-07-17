@@ -96,7 +96,8 @@ export function TrackApplication() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (trackingInput.trim()) setSubmittedCode(trackingInput.trim().toUpperCase());
+    const raw = trackingInput.trim().toUpperCase();
+    if (raw) setSubmittedCode(raw);
   };
 
   return (

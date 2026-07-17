@@ -69,10 +69,20 @@ router.get("/applications/track", async (req, res): Promise<void> => {
     return;
   }
   const { code } = parsed.data;
+  // Normalise: strip all spaces and uppercase, then match against stored code
+  // (stored codes may contain a space, e.g. "ZVAKL651161FT5TL 72")
+  const normalised = code.replace(/\s+/g, '').toUpperCase();
   const results = await db
     .select()
     .from(applicationsTable)
-    .where(eq(applicationsTable.trackingCode, code.toUpperCase()))
+    .where(
+      or(
+        eq(applicationsTable.trackingCode, normalised),
+        eq(applicationsTable.trackingCode, code.toUpperCase()),
+        // match stored codes that have a space by stripping their space too
+        ilike(applicationsTable.trackingCode, normalised.slice(0, -2) + ' ' + normalised.slice(-2)),
+      )
+    )
     .limit(1);
 
   if (!results.length) {
