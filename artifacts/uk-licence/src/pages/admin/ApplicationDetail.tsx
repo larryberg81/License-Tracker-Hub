@@ -354,6 +354,12 @@ export function ApplicationDetail() {
                   {LICENCE_TYPE_LABELS[app.licenceType] ?? app.licenceType}
                 </Badge>
               </div>
+              {app.referenceNumber && (
+                <div>
+                  <p className="text-sm font-bold text-slate-500 mb-1">Reference / Licence No.</p>
+                  <p className="font-mono font-bold text-slate-900 tracking-widest">{app.referenceNumber}</p>
+                </div>
+              )}
               {app.licenceCategory && (
                 <div>
                   <p className="text-sm font-bold text-slate-500 mb-1">Category</p>

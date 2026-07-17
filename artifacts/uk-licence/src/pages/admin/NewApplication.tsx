@@ -156,6 +156,7 @@ export function NewApplication() {
     dateOfBirth: '',
     licenceType: 'provisional' as 'provisional' | 'full_car' | 'full_motorcycle' | 'full_lorry' | 'full_bus' | 'full_minibus' | 'international',
     licenceCategory: '',
+    referenceNumber: '',
     notes: '',
     estimatedCompletion: '',
   });
@@ -175,6 +176,7 @@ export function NewApplication() {
       licenceType: formData.licenceType,
       ...(formData.phone && { phone: formData.phone }),
       ...(formData.licenceCategory && { licenceCategory: formData.licenceCategory }),
+      ...(formData.referenceNumber && { referenceNumber: formData.referenceNumber.toUpperCase() }),
       ...(formData.notes && { notes: formData.notes }),
       ...(formData.estimatedCompletion && { estimatedCompletion: formData.estimatedCompletion }),
       ...(imageFront && { licenceImageFront: imageFront }),
@@ -281,6 +283,16 @@ export function NewApplication() {
                     placeholder="e.g. B, A, C"
                   />
                 </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="referenceNumber" className="font-bold text-slate-700">Reference / Licence Number (optional)</Label>
+                <Input
+                  id="referenceNumber" name="referenceNumber"
+                  value={formData.referenceNumber} onChange={handleChange}
+                  className="bg-white font-mono uppercase tracking-widest"
+                  placeholder="e.g. JONES061102W97YT"
+                />
               </div>
 
               <div className="space-y-2">

@@ -75,6 +75,8 @@ export interface Application {
   licenceType: ApplicationLicenceType;
   /** @nullable */
   licenceCategory: string | null;
+  /** @nullable */
+  referenceNumber: string | null;
   status: ApplicationStatus;
   /** @nullable */
   notes: string | null;
@@ -109,6 +111,7 @@ export interface ApplicationInput {
   dateOfBirth: string;
   licenceType: ApplicationInputLicenceType;
   licenceCategory?: string;
+  referenceNumber?: string;
   notes?: string;
   estimatedCompletion?: string;
   licenceImageFront?: string;
@@ -147,6 +150,7 @@ export interface ApplicationUpdate {
   phone?: string;
   licenceType?: ApplicationUpdateLicenceType;
   licenceCategory?: string;
+  referenceNumber?: string;
   licenceImageFront?: string;
   licenceImageBack?: string;
 }
