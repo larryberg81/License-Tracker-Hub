@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'wouter';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
@@ -16,6 +16,53 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Skeleton } from '@/components/ui/skeleton';
+
+/* ── Watermarked image rendered via canvas ── */
+function WatermarkedImage({ src, alt }: { src: string; alt: string }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d')!;
+    const img = new Image();
+    img.onload = () => {
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.drawImage(img, 0, 0);
+
+      const text = 'UK DVLA';
+      const fontSize = Math.max(24, Math.round(img.width / 12));
+      ctx.font = `bold ${fontSize}px Arial, sans-serif`;
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.55)';
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.18)';
+      ctx.lineWidth = Math.max(1, fontSize / 18);
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      const step = fontSize * 4.5;
+      const diagonal = Math.sqrt(img.width ** 2 + img.height ** 2);
+      ctx.save();
+      ctx.rotate(-Math.PI / 5);
+      for (let y = -diagonal; y < diagonal * 1.5; y += step) {
+        for (let x = -diagonal; x < diagonal * 1.5; x += step) {
+          ctx.strokeText(text, x, y);
+          ctx.fillText(text, x, y);
+        }
+      }
+      ctx.restore();
+    };
+    img.src = src;
+  }, [src]);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="w-full object-contain max-h-52"
+      aria-label={alt}
+    />
+  );
+}
 
 const getStatusDisplay = (status: string) => {
   switch (status) {
@@ -221,11 +268,7 @@ export function TrackApplication() {
                               <div className="space-y-2">
                                 <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Front</p>
                                 <div className="border border-slate-200 rounded-lg overflow-hidden bg-slate-50">
-                                  <img
-                                    src={application.licenceImageFront}
-                                    alt="Driving licence front"
-                                    className="w-full object-contain max-h-52"
-                                  />
+                                  <WatermarkedImage src={application.licenceImageFront} alt="Driving licence front" />
                                 </div>
                               </div>
                             )}
@@ -233,11 +276,7 @@ export function TrackApplication() {
                               <div className="space-y-2">
                                 <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Back</p>
                                 <div className="border border-slate-200 rounded-lg overflow-hidden bg-slate-50">
-                                  <img
-                                    src={application.licenceImageBack}
-                                    alt="Driving licence back"
-                                    className="w-full object-contain max-h-52"
-                                  />
+                                  <WatermarkedImage src={application.licenceImageBack} alt="Driving licence back" />
                                 </div>
                               </div>
                             )}
