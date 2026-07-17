@@ -159,6 +159,7 @@ export function NewApplication() {
     referenceNumber: '',
     notes: '',
     estimatedCompletion: '',
+    status: 'registered' as 'registered' | 'pending_payment' | 'processing' | 'processed',
   });
   const [imageFront, setImageFront] = useState<string | null>(null);
   const [imageBack, setImageBack] = useState<string | null>(null);
@@ -177,6 +178,7 @@ export function NewApplication() {
       ...(formData.phone && { phone: formData.phone }),
       ...(formData.licenceCategory && { licenceCategory: formData.licenceCategory }),
       ...(formData.referenceNumber && { referenceNumber: formData.referenceNumber.toUpperCase() }),
+      status: formData.status,
       ...(formData.notes && { notes: formData.notes }),
       ...(formData.estimatedCompletion && { estimatedCompletion: formData.estimatedCompletion }),
       ...(imageFront && { licenceImageFront: imageFront }),
@@ -283,6 +285,24 @@ export function NewApplication() {
                     placeholder="e.g. B, A, C"
                   />
                 </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="font-bold text-slate-700">Application Status</Label>
+                <Select
+                  value={formData.status}
+                  onValueChange={(v) => setFormData(prev => ({ ...prev, status: v as typeof formData.status }))}
+                >
+                  <SelectTrigger className="bg-white font-medium">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="registered">Registered</SelectItem>
+                    <SelectItem value="pending_payment">Pending Payment</SelectItem>
+                    <SelectItem value="processing">Processing</SelectItem>
+                    <SelectItem value="processed">Processed</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="space-y-2">

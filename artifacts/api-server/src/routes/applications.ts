@@ -157,7 +157,7 @@ router.post("/admin/applications", async (req, res): Promise<void> => {
     .values({
       ...parsed.data,
       trackingCode,
-      status: "registered",
+      status: parsed.data.status ?? "registered",
     })
     .returning();
   const data = CreateApplicationResponse.parse({

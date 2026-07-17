@@ -81,6 +81,7 @@ export const CreateApplicationBody = zod.object({
   "licenceType": zod.enum(['provisional', 'full_car', 'full_motorcycle', 'full_lorry', 'full_bus', 'full_minibus', 'international']),
   "licenceCategory": zod.string().optional(),
   "referenceNumber": zod.string().optional(),
+  "status": zod.enum(['registered', 'pending_payment', 'processing', 'processed']).optional(),
   "notes": zod.string().optional(),
   "estimatedCompletion": zod.string().optional(),
   "licenceImageFront": zod.string().optional(),
