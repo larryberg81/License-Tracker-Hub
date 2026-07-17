@@ -1,0 +1,27 @@
+kind = "web"
+previewPath = "/"
+title = "UK Driver's Licence Hub"
+version = "1.0.0"
+id = "artifacts/uk-licence"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 21292
+
+[services.development]
+run = "pnpm --filter @workspace/uk-licence run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/uk-licence", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/uk-licence/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "21292"
+BASE_PATH = "/"

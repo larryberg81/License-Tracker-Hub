@@ -1,0 +1,288 @@
+import { Router, type IRouter } from "express";
+import { eq, ilike, or, desc } from "drizzle-orm";
+import { db, applicationsTable } from "@workspace/db";
+import {
+  TrackApplicationQueryParams,
+  TrackApplicationResponse,
+  ListApplicationsQueryParams,
+  ListApplicationsResponse,
+  CreateApplicationBody,
+  CreateApplicationResponse,
+  GetApplicationParams,
+  GetApplicationResponse,
+  UpdateApplicationParams,
+  UpdateApplicationBody,
+  UpdateApplicationResponse,
+  DeleteApplicationParams,
+  GetStatsResponse,
+  AdminLoginBody,
+  AdminLoginResponse,
+} from "@workspace/api-zod";
+
+const router: IRouter = Router();
+
+function generateTrackingCode(): string {
+  const letters = "ABCDEFGHJKLMNPQRSTUVWXYZ";
+  const numbers = "0123456789";
+  let code = "UK";
+  for (let i = 0; i < 2; i++) code += letters[Math.floor(Math.random() * letters.length)];
+  code += "-";
+  for (let i = 0; i < 4; i++) code += numbers[Math.floor(Math.random() * numbers.length)];
+  code += "-";
+  for (let i = 0; i < 3; i++) code += letters[Math.floor(Math.random() * letters.length)];
+  return code;
+}
+
+const STATUS_LABELS: Record<string, string> = {
+  registered: "Registered",
+  pending_payment: "Pending Payment",
+  processing: "Processing",
+  processed: "Processed",
+};
+
+const STATUS_DESCRIPTIONS: Record<string, string> = {
+  registered: "Your application has been received and registered in our system.",
+  pending_payment: "Your application is awaiting payment. Please complete the payment to proceed.",
+  processing: "Your application is being reviewed and processed by our team.",
+  processed: "Your application has been fully processed. Your licence will be dispatched shortly.",
+};
+
+const LICENCE_TYPE_LABELS: Record<string, string> = {
+  provisional: "Provisional Licence",
+  full_car: "Full Car Licence (Category B)",
+  full_motorcycle: "Full Motorcycle Licence (Category A)",
+  full_lorry: "Full Lorry Licence (Category C)",
+  full_bus: "Full Bus Licence (Category D)",
+  full_minibus: "Full Minibus Licence (Category D1)",
+  international: "International Driving Permit (IDP)",
+};
+
+// Public tracking endpoint
+router.get("/applications/track", async (req, res): Promise<void> => {
+  const parsed = TrackApplicationQueryParams.safeParse(req.query);
+  if (!parsed.success) {
+    res.status(400).json({ error: "Invalid query parameters" });
+    return;
+  }
+  const { code } = parsed.data;
+  const results = await db
+    .select()
+    .from(applicationsTable)
+    .where(eq(applicationsTable.trackingCode, code.toUpperCase()))
+    .limit(1);
+
+  if (!results.length) {
+    res.status(404).json({ error: "Application not found. Please check your tracking code." });
+    return;
+  }
+  const app = results[0];
+  const data = TrackApplicationResponse.parse({
+    trackingCode: app.trackingCode,
+    fullName: app.fullName,
+    licenceType: LICENCE_TYPE_LABELS[app.licenceType] || app.licenceType,
+    status: app.status,
+    statusLabel: STATUS_LABELS[app.status] || app.status,
+    statusDescription: STATUS_DESCRIPTIONS[app.status] || "",
+    submittedAt: app.submittedAt.toISOString(),
+    estimatedCompletion: app.estimatedCompletion ?? null,
+    notes: app.notes ?? null,
+  });
+  res.json(data);
+});
+
+// Admin: list applications
+router.get("/admin/applications", async (req, res): Promise<void> => {
+  const parsed = ListApplicationsQueryParams.safeParse(req.query);
+  if (!parsed.success) {
+    res.status(400).json({ error: "Invalid query parameters" });
+    return;
+  }
+  const { status, search } = parsed.data;
+  let query = db.select().from(applicationsTable).$dynamic();
+
+  if (status) {
+    query = query.where(eq(applicationsTable.status, status as any));
+  } else if (search) {
+    query = query.where(
+      or(
+        ilike(applicationsTable.fullName, `%${search}%`),
+        ilike(applicationsTable.email, `%${search}%`),
+        ilike(applicationsTable.trackingCode, `%${search}%`)
+      )
+    );
+  }
+
+  const apps = await query.orderBy(desc(applicationsTable.submittedAt));
+  const data = ListApplicationsResponse.parse(
+    apps.map((a) => ({
+      ...a,
+      phone: a.phone ?? null,
+      licenceCategory: a.licenceCategory ?? null,
+      notes: a.notes ?? null,
+      estimatedCompletion: a.estimatedCompletion ?? null,
+      submittedAt: a.submittedAt.toISOString(),
+      updatedAt: a.updatedAt.toISOString(),
+    }))
+  );
+  res.json(data);
+});
+
+// Admin: create application
+router.post("/admin/applications", async (req, res): Promise<void> => {
+  const parsed = CreateApplicationBody.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.message });
+    return;
+  }
+  const trackingCode = generateTrackingCode();
+  const [created] = await db
+    .insert(applicationsTable)
+    .values({
+      ...parsed.data,
+      trackingCode,
+      status: "registered",
+    })
+    .returning();
+  const data = CreateApplicationResponse.parse({
+    ...created,
+    phone: created.phone ?? null,
+    licenceCategory: created.licenceCategory ?? null,
+    notes: created.notes ?? null,
+    estimatedCompletion: created.estimatedCompletion ?? null,
+    submittedAt: created.submittedAt.toISOString(),
+    updatedAt: created.updatedAt.toISOString(),
+  });
+  res.status(201).json(data);
+});
+
+// Admin: get application by id
+router.get("/admin/applications/:id", async (req, res): Promise<void> => {
+  const rawId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const parsed = GetApplicationParams.safeParse({ id: parseInt(rawId, 10) });
+  if (!parsed.success) {
+    res.status(400).json({ error: "Invalid application ID" });
+    return;
+  }
+  const results = await db
+    .select()
+    .from(applicationsTable)
+    .where(eq(applicationsTable.id, parsed.data.id))
+    .limit(1);
+
+  if (!results.length) {
+    res.status(404).json({ error: "Application not found" });
+    return;
+  }
+  const a = results[0];
+  const data = GetApplicationResponse.parse({
+    ...a,
+    phone: a.phone ?? null,
+    licenceCategory: a.licenceCategory ?? null,
+    notes: a.notes ?? null,
+    estimatedCompletion: a.estimatedCompletion ?? null,
+    submittedAt: a.submittedAt.toISOString(),
+    updatedAt: a.updatedAt.toISOString(),
+  });
+  res.json(data);
+});
+
+// Admin: update application
+router.patch("/admin/applications/:id", async (req, res): Promise<void> => {
+  const rawId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const paramsParsed = UpdateApplicationParams.safeParse({ id: parseInt(rawId, 10) });
+  if (!paramsParsed.success) {
+    res.status(400).json({ error: "Invalid application ID" });
+    return;
+  }
+  const bodyParsed = UpdateApplicationBody.safeParse(req.body);
+  if (!bodyParsed.success) {
+    res.status(400).json({ error: bodyParsed.error.message });
+    return;
+  }
+
+  const [updated] = await db
+    .update(applicationsTable)
+    .set({ ...bodyParsed.data, updatedAt: new Date() })
+    .where(eq(applicationsTable.id, paramsParsed.data.id))
+    .returning();
+
+  if (!updated) {
+    res.status(404).json({ error: "Application not found" });
+    return;
+  }
+  const data = UpdateApplicationResponse.parse({
+    ...updated,
+    phone: updated.phone ?? null,
+    licenceCategory: updated.licenceCategory ?? null,
+    notes: updated.notes ?? null,
+    estimatedCompletion: updated.estimatedCompletion ?? null,
+    submittedAt: updated.submittedAt.toISOString(),
+    updatedAt: updated.updatedAt.toISOString(),
+  });
+  res.json(data);
+});
+
+// Admin: delete application
+router.delete("/admin/applications/:id", async (req, res): Promise<void> => {
+  const rawId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const parsed = DeleteApplicationParams.safeParse({ id: parseInt(rawId, 10) });
+  if (!parsed.success) {
+    res.status(400).json({ error: "Invalid application ID" });
+    return;
+  }
+  await db.delete(applicationsTable).where(eq(applicationsTable.id, parsed.data.id));
+  res.status(204).send();
+});
+
+// Admin: stats
+router.get("/admin/stats", async (req, res): Promise<void> => {
+  const all = await db
+    .select()
+    .from(applicationsTable)
+    .orderBy(desc(applicationsTable.submittedAt));
+
+  const counts = { registered: 0, pending_payment: 0, processing: 0, processed: 0 };
+  for (const a of all) {
+    if (a.status in counts) counts[a.status as keyof typeof counts]++;
+  }
+  const recentApplications = all.slice(0, 5).map((a) => ({
+    ...a,
+    phone: a.phone ?? null,
+    licenceCategory: a.licenceCategory ?? null,
+    notes: a.notes ?? null,
+    estimatedCompletion: a.estimatedCompletion ?? null,
+    submittedAt: a.submittedAt.toISOString(),
+    updatedAt: a.updatedAt.toISOString(),
+  }));
+
+  const data = GetStatsResponse.parse({
+    total: all.length,
+    ...counts,
+    recentApplications,
+  });
+  res.json(data);
+});
+
+// Admin: login
+router.post("/admin/login", async (req, res): Promise<void> => {
+  const parsed = AdminLoginBody.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: "Invalid request" });
+    return;
+  }
+  const { username, password } = parsed.data;
+  const ADMIN_USERNAME = process.env.ADMIN_USERNAME || "admin";
+  const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "dvla_admin_2025";
+
+  if (username !== ADMIN_USERNAME || password !== ADMIN_PASSWORD) {
+    res.status(401).json({ error: "Invalid username or password" });
+    return;
+  }
+
+  // Simple token: base64 encoded timestamp + credentials hash
+  const token = Buffer.from(`${username}:${Date.now()}:uk-licence-admin`).toString("base64");
+  const data = AdminLoginResponse.parse({ token, message: "Login successful" });
+  res.json(data);
+});
+
+export default router;

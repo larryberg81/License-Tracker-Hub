@@ -3,13 +3,18 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: UK Driver's Licence Hub API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: applications
+    description: Licence application tracking
+  - name: admin
+    description: Admin operations
+
 paths:
   /healthz:
     get:
@@ -24,6 +29,176 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /applications/track:
+    get:
+      operationId: trackApplication
+      tags: [applications]
+      summary: Track application by code
+      description: Returns public tracking info for an application
+      parameters:
+        - name: code
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Application tracking info
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApplicationTracking"
+        "404":
+          description: Application not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /admin/applications:
+    get:
+      operationId: listApplications
+      tags: [admin]
+      summary: List all applications
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [registered, pending_payment, processing, processed]
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of applications
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Application"
+    post:
+      operationId: createApplication
+      tags: [admin]
+      summary: Create new application and generate tracking code
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApplicationInput"
+      responses:
+        "201":
+          description: Created application
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Application"
+
+  /admin/applications/{id}:
+    get:
+      operationId: getApplication
+      tags: [admin]
+      summary: Get application by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Application details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Application"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    patch:
+      operationId: updateApplication
+      tags: [admin]
+      summary: Update application status or details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApplicationUpdate"
+      responses:
+        "200":
+          description: Updated application
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Application"
+    delete:
+      operationId: deleteApplication
+      tags: [admin]
+      summary: Delete an application
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /admin/stats:
+    get:
+      operationId: getStats
+      tags: [admin]
+      summary: Get application statistics summary
+      responses:
+        "200":
+          description: Stats summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Stats"
+
+  /admin/login:
+    post:
+      operationId: adminLogin
+      tags: [admin]
+      summary: Admin login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginInput"
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +209,185 @@ components:
       required:
         - status
 
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+
+    ApplicationTracking:
+      type: object
+      properties:
+        trackingCode:
+          type: string
+        fullName:
+          type: string
+        licenceType:
+          type: string
+        status:
+          type: string
+          enum: [registered, pending_payment, processing, processed]
+        statusLabel:
+          type: string
+        statusDescription:
+          type: string
+        submittedAt:
+          type: string
+        estimatedCompletion:
+          type: ["string", "null"]
+        notes:
+          type: ["string", "null"]
+      required:
+        - trackingCode
+        - fullName
+        - licenceType
+        - status
+        - statusLabel
+        - statusDescription
+        - submittedAt
+        - estimatedCompletion
+        - notes
+
+    Application:
+      type: object
+      properties:
+        id:
+          type: integer
+        trackingCode:
+          type: string
+        fullName:
+          type: string
+        email:
+          type: string
+        phone:
+          type: ["string", "null"]
+        dateOfBirth:
+          type: string
+        licenceType:
+          type: string
+          enum: [provisional, full_car, full_motorcycle, full_lorry, full_bus, full_minibus, international]
+        licenceCategory:
+          type: ["string", "null"]
+        status:
+          type: string
+          enum: [registered, pending_payment, processing, processed]
+        notes:
+          type: ["string", "null"]
+        estimatedCompletion:
+          type: ["string", "null"]
+        submittedAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - trackingCode
+        - fullName
+        - email
+        - dateOfBirth
+        - licenceType
+        - status
+        - submittedAt
+        - updatedAt
+        - phone
+        - licenceCategory
+        - notes
+        - estimatedCompletion
+
+    ApplicationInput:
+      type: object
+      properties:
+        fullName:
+          type: string
+          minLength: 2
+        email:
+          type: string
+        phone:
+          type: string
+        dateOfBirth:
+          type: string
+        licenceType:
+          type: string
+          enum: [provisional, full_car, full_motorcycle, full_lorry, full_bus, full_minibus, international]
+        licenceCategory:
+          type: string
+        notes:
+          type: string
+        estimatedCompletion:
+          type: string
+      required:
+        - fullName
+        - email
+        - dateOfBirth
+        - licenceType
+
+    ApplicationUpdate:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [registered, pending_payment, processing, processed]
+        notes:
+          type: string
+        estimatedCompletion:
+          type: string
+        fullName:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        licenceType:
+          type: string
+          enum: [provisional, full_car, full_motorcycle, full_lorry, full_bus, full_minibus, international]
+        licenceCategory:
+          type: string
+
+    Stats:
+      type: object
+      properties:
+        total:
+          type: integer
+        registered:
+          type: integer
+        pending_payment:
+          type: integer
+        processing:
+          type: integer
+        processed:
+          type: integer
+        recentApplications:
+          type: array
+          items:
+            $ref: "#/components/schemas/Application"
+      required:
+        - total
+        - registered
+        - pending_payment
+        - processing
+        - processed
+        - recentApplications
+
+    LoginInput:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      required:
+        - username
+        - password
+
+    LoginResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        message:
+          type: string
+      required:
+        - token
+        - message
