@@ -227,10 +227,10 @@ export function NewApplication() {
                   onChange={(e) => setFormData(prev => ({ ...prev, trackingCode: e.target.value.toUpperCase() }))}
                   required
                   className="bg-white font-mono tracking-widest text-lg"
-                  placeholder="e.g. KHANX902077SN9JU 35"
+                  placeholder="e.g. MZRTW461829BK7QP 54"
                   maxLength={20}
                 />
-                <p className="text-xs text-slate-500">Format: 16 uppercase characters followed by a space and 2 digits — e.g. <span className="font-mono">KHANX902077SN9JU 35</span></p>
+                <p className="text-xs text-slate-500">Format: 16 uppercase characters followed by a space and 2 digits — e.g. <span className="font-mono">MZRTW461829BK7QP 54</span></p>
               </div>
 
               {/* Applicant fields */}
