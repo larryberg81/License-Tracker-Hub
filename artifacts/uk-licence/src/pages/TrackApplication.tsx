@@ -79,12 +79,12 @@ export function TrackApplication() {
                   <Label htmlFor="trackingCode" className="text-base font-bold text-slate-900">
                     Tracking reference number
                   </Label>
-                  <p className="text-sm text-slate-600">For example, UKAB-1234-XYZ</p>
+                  <p className="text-sm text-slate-600">For example, KHANX902077SN9JU</p>
                   <Input
                     id="trackingCode"
                     value={trackingInput}
                     onChange={(e) => setTrackingInput(e.target.value)}
-                    placeholder="UKXX-0000-XXX"
+                    placeholder="XXXXX000000XX0XX"
                     className="max-w-md uppercase font-mono text-lg py-6"
                     required
                   />

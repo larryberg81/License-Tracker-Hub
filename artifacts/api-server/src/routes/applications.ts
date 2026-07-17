@@ -22,15 +22,17 @@ import {
 const router: IRouter = Router();
 
 function generateTrackingCode(): string {
-  const letters = "ABCDEFGHJKLMNPQRSTUVWXYZ";
-  const numbers = "0123456789";
-  let code = "UK";
-  for (let i = 0; i < 2; i++) code += letters[Math.floor(Math.random() * letters.length)];
-  code += "-";
-  for (let i = 0; i < 4; i++) code += numbers[Math.floor(Math.random() * numbers.length)];
-  code += "-";
-  for (let i = 0; i < 3; i++) code += letters[Math.floor(Math.random() * letters.length)];
-  return code;
+  const L = "ABCDEFGHJKLMNPQRSTUVWXYZ";
+  const N = "0123456789";
+  const r = (set: string) => set[Math.floor(Math.random() * set.length)];
+  // Format: [5 letters][6 digits][2 letters][1 digit][2 letters]  e.g. KHANX902077SN9JU
+  return (
+    r(L) + r(L) + r(L) + r(L) + r(L) +
+    r(N) + r(N) + r(N) + r(N) + r(N) + r(N) +
+    r(L) + r(L) +
+    r(N) +
+    r(L) + r(L)
+  );
 }
 
 const STATUS_LABELS: Record<string, string> = {
