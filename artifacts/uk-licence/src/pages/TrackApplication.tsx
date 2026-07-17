@@ -127,7 +127,7 @@ export function TrackApplication() {
                   <Label htmlFor="trackingCode" className="text-base font-bold text-slate-900">
                     Tracking reference number
                   </Label>
-                  <p className="text-sm text-slate-600">For example, KHANX902077SN9JU 35</p>
+                  <p className="text-sm text-slate-600">For example, MZRTW461829BK7QP 54</p>
                   <Input
                     id="trackingCode"
                     value={trackingInput}
