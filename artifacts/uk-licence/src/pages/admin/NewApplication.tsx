@@ -224,11 +224,11 @@ export function NewApplication() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="font-bold text-slate-700">Email Address</Label>
+                  <Label htmlFor="email" className="font-bold text-slate-700">Email Address (optional)</Label>
                   <Input
                     id="email" name="email" type="email"
                     value={formData.email} onChange={handleChange}
-                    required className="bg-white"
+                    className="bg-white"
                   />
                 </div>
               </div>

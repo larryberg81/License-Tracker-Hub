@@ -23,7 +23,7 @@ export const applicationsTable = pgTable("applications", {
   id: serial("id").primaryKey(),
   trackingCode: text("tracking_code").notNull().unique(),
   fullName: text("full_name").notNull(),
-  email: text("email").notNull(),
+  email: text("email"),
   phone: text("phone"),
   dateOfBirth: text("date_of_birth").notNull(),
   licenceType: licenceTypeEnum("licence_type").notNull(),

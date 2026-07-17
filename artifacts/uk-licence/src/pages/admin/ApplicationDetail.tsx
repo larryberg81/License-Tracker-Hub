@@ -244,13 +244,15 @@ export function ApplicationDetail() {
                   <p className="text-sm font-bold text-slate-500 mb-1">Date of Birth</p>
                   <p className="text-lg font-medium text-slate-900">{formatDate(app.dateOfBirth)}</p>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Mail className="h-4 w-4 text-slate-400" />
-                  <div>
-                    <p className="text-sm font-bold text-slate-500 mb-1">Email</p>
-                    <p className="font-medium text-slate-900">{app.email}</p>
+                {app.email && (
+                  <div className="flex items-center gap-2">
+                    <Mail className="h-4 w-4 text-slate-400" />
+                    <div>
+                      <p className="text-sm font-bold text-slate-500 mb-1">Email</p>
+                      <p className="font-medium text-slate-900">{app.email}</p>
+                    </div>
                   </div>
-                </div>
+                )}
                 {app.phone && (
                   <div className="flex items-center gap-2">
                     <Phone className="h-4 w-4 text-slate-400" />

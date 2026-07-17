@@ -68,7 +68,8 @@ export interface Application {
   id: number;
   trackingCode: string;
   fullName: string;
-  email: string;
+  /** @nullable */
+  email: string | null;
   /** @nullable */
   phone: string | null;
   dateOfBirth: string;
@@ -106,7 +107,7 @@ export const ApplicationInputLicenceType = {
 export interface ApplicationInput {
   /** @minLength 2 */
   fullName: string;
-  email: string;
+  email?: string;
   phone?: string;
   dateOfBirth: string;
   licenceType: ApplicationInputLicenceType;

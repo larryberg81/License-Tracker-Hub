@@ -132,6 +132,7 @@ router.get("/admin/applications", async (req, res): Promise<void> => {
   const data = ListApplicationsResponse.parse(
     apps.map((a) => ({
       ...a,
+      email: a.email ?? null,
       phone: a.phone ?? null,
       licenceCategory: a.licenceCategory ?? null,
       notes: a.notes ?? null,
@@ -161,6 +162,7 @@ router.post("/admin/applications", async (req, res): Promise<void> => {
     .returning();
   const data = CreateApplicationResponse.parse({
     ...created,
+    email: created.email ?? null,
     phone: created.phone ?? null,
     licenceCategory: created.licenceCategory ?? null,
     referenceNumber: created.referenceNumber ?? null,
@@ -195,6 +197,7 @@ router.get("/admin/applications/:id", async (req, res): Promise<void> => {
   const a = results[0];
   const data = GetApplicationResponse.parse({
     ...a,
+    email: a.email ?? null,
     phone: a.phone ?? null,
     licenceCategory: a.licenceCategory ?? null,
     referenceNumber: a.referenceNumber ?? null,
@@ -234,6 +237,7 @@ router.patch("/admin/applications/:id", async (req, res): Promise<void> => {
   }
   const data = UpdateApplicationResponse.parse({
     ...updated,
+    email: updated.email ?? null,
     phone: updated.phone ?? null,
     licenceCategory: updated.licenceCategory ?? null,
     referenceNumber: updated.referenceNumber ?? null,
