@@ -11,29 +11,19 @@ import { formatDate } from '@/lib/utils';
 import { useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import {
   ArrowLeft, User, CreditCard, Calendar, Activity,
-  Mail, Phone, ImagePlus, Trash2, Upload,
+  ImagePlus, Trash2, Upload, Save, CheckCircle2,
 } from 'lucide-react';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
-import { useState, useRef } from 'react';
-
-const LICENCE_TYPE_LABELS: Record<string, string> = {
-  provisional: 'Provisional Licence',
-  full_car: 'Full Car Licence (Category B)',
-  full_motorcycle: 'Full Motorcycle Licence (Category A)',
-  full_lorry: 'Full Lorry Licence (Category C)',
-  full_bus: 'Full Bus Licence (Category D)',
-  full_minibus: 'Full Minibus Licence (Category D1)',
-  international: 'International Driving Permit (IDP)',
-};
+import { useState, useRef, useEffect } from 'react';
+import type { Application } from '@workspace/api-client-react';
 
 /* ── Image upload slot ── */
 function ImageSlot({
@@ -58,7 +48,6 @@ function ImageSlot({
   return (
     <div className="space-y-2">
       <p className="text-sm font-bold text-slate-600 uppercase tracking-widest">{label}</p>
-
       {value ? (
         <div className="relative group border border-slate-200 rounded-lg overflow-hidden bg-slate-50">
           <img src={value} alt={label} className="w-full object-contain max-h-52" />
@@ -93,7 +82,6 @@ function ImageSlot({
           <p className="text-xs text-slate-400">JPG, PNG, WEBP</p>
         </div>
       )}
-
       <input
         ref={inputRef}
         type="file"
@@ -105,16 +93,46 @@ function ImageSlot({
   );
 }
 
+/* ── Saved indicator ── */
+function SavedBadge({ show }: { show: boolean }) {
+  if (!show) return null;
+  return (
+    <span className="inline-flex items-center gap-1.5 text-gov-green font-bold text-sm">
+      <CheckCircle2 className="h-4 w-4" /> Saved
+    </span>
+  );
+}
+
+/* ── Section editable fields state ── */
+type ApplicantFields = {
+  fullName: string;
+  dateOfBirth: string;
+  email: string;
+  phone: string;
+};
+
+type LicenceFields = {
+  licenceType: Application['licenceType'];
+  licenceCategory: string;
+  referenceNumber: string;
+};
+
+type NotesFields = {
+  notes: string;
+  estimatedCompletion: string;
+};
+
+function toDateInput(val: string | null | undefined): string {
+  if (!val) return '';
+  // Already YYYY-MM-DD or ISO string
+  return val.slice(0, 10);
+}
+
 /* ── Main component ── */
 export function ApplicationDetail() {
   const [, params] = useRoute('/admin/applications/:id');
   const id = params?.id ? parseInt(params.id, 10) : 0;
   const queryClient = useQueryClient();
-  const [notesValue, setNotesValue] = useState<string | null>(null);
-  const [estCompletion, setEstCompletion] = useState<string | null>(null);
-  const [imageFront, setImageFront] = useState<string | null | undefined>(undefined); // undefined = not yet overridden
-  const [imageBack, setImageBack] = useState<string | null | undefined>(undefined);
-  const [imageSaved, setImageSaved] = useState(false);
 
   const { data: app, isLoading, isError } = useGetApplication(id, {
     query: { enabled: !!id, queryKey: getGetApplicationQueryKey(id) }
@@ -123,63 +141,115 @@ export function ApplicationDetail() {
   const updateMutation = useUpdateApplication();
   const deleteMutation = useDeleteApplication();
 
-  const currentNotes = notesValue ?? app?.notes ?? '';
-  const currentEst = estCompletion ?? app?.estimatedCompletion ?? '';
+  // ── Applicant fields state
+  const [applicant, setApplicant] = useState<ApplicantFields | null>(null);
+  const [applicantSaved, setApplicantSaved] = useState(false);
 
-  // Image values: use local state if admin has made a change, else fall back to server data
-  const currentFront = imageFront !== undefined ? imageFront : (app?.licenceImageFront ?? null);
-  const currentBack = imageBack !== undefined ? imageBack : (app?.licenceImageBack ?? null);
+  // ── Licence info fields state
+  const [licence, setLicence] = useState<LicenceFields | null>(null);
+  const [licenceSaved, setLicenceSaved] = useState(false);
 
-  const handleStatusChange = (newStatus: 'registered' | 'pending_payment' | 'processing' | 'processed') => {
+  // ── Notes / completion state
+  const [notes, setNotes] = useState<NotesFields | null>(null);
+  const [notesSaved, setNotesSaved] = useState(false);
+
+  // ── Image state
+  const [imageFront, setImageFront] = useState<string | null | undefined>(undefined);
+  const [imageBack, setImageBack] = useState<string | null | undefined>(undefined);
+  const [imagesSaved, setImagesSaved] = useState(false);
+
+  // Seed local state once data arrives (only if not yet set)
+  useEffect(() => {
     if (!app) return;
+    if (!applicant) {
+      setApplicant({
+        fullName: app.fullName,
+        dateOfBirth: toDateInput(app.dateOfBirth),
+        email: app.email ?? '',
+        phone: app.phone ?? '',
+      });
+    }
+    if (!licence) {
+      setLicence({
+        licenceType: app.licenceType,
+        licenceCategory: app.licenceCategory ?? '',
+        referenceNumber: app.referenceNumber ?? '',
+      });
+    }
+    if (!notes) {
+      setNotes({
+        notes: app.notes ?? '',
+        estimatedCompletion: toDateInput(app.estimatedCompletion),
+      });
+    }
+  }, [app]);
+
+  const currentFront = imageFront !== undefined ? imageFront : (app?.licenceImageFront ?? null);
+  const currentBack  = imageBack  !== undefined ? imageBack  : (app?.licenceImageBack  ?? null);
+
+  const imagesDirty =
+    (imageFront !== undefined && imageFront !== (app?.licenceImageFront ?? null)) ||
+    (imageBack  !== undefined && imageBack  !== (app?.licenceImageBack  ?? null));
+
+  const invalidate = (updated: Application) => {
+    queryClient.setQueryData(getGetApplicationQueryKey(id), updated);
+    queryClient.setQueryData(getListApplicationsQueryKey(), (old: any) => {
+      if (!Array.isArray(old)) return old;
+      return old.map(item => item.id === id ? updated : item);
+    });
+  };
+
+  const flash = (setter: (v: boolean) => void) => {
+    setter(true);
+    setTimeout(() => setter(false), 3000);
+  };
+
+  const handleSaveApplicant = () => {
+    if (!applicant) return;
     updateMutation.mutate(
-      { id, data: { status: newStatus } },
-      {
-        onSuccess: (updated) => {
-          queryClient.setQueryData(getGetApplicationQueryKey(id), updated);
-          queryClient.setQueryData(getListApplicationsQueryKey(), (old: any) => {
-            if (!Array.isArray(old)) return old;
-            return old.map(item => item.id === id ? updated : item);
-          });
-        }
-      }
+      { id, data: { fullName: applicant.fullName, dateOfBirth: applicant.dateOfBirth, email: applicant.email || undefined, phone: applicant.phone || undefined } },
+      { onSuccess: (u) => { invalidate(u); flash(setApplicantSaved); } }
+    );
+  };
+
+  const handleSaveLicence = () => {
+    if (!licence) return;
+    updateMutation.mutate(
+      { id, data: { licenceType: licence.licenceType, licenceCategory: licence.licenceCategory || undefined, referenceNumber: licence.referenceNumber ? licence.referenceNumber.toUpperCase() : undefined } },
+      { onSuccess: (u) => { invalidate(u); flash(setLicenceSaved); } }
     );
   };
 
   const handleSaveNotes = () => {
+    if (!notes) return;
     updateMutation.mutate(
-      { id, data: { notes: currentNotes, estimatedCompletion: currentEst || undefined } },
-      { onSuccess: (updated) => queryClient.setQueryData(getGetApplicationQueryKey(id), updated) }
+      { id, data: { notes: notes.notes || undefined, estimatedCompletion: notes.estimatedCompletion || undefined } },
+      { onSuccess: (u) => { invalidate(u); flash(setNotesSaved); } }
     );
   };
 
   const handleSaveImages = () => {
-    setImageSaved(false);
     updateMutation.mutate(
+      { id, data: { licenceImageFront: currentFront ?? undefined, licenceImageBack: currentBack ?? undefined } },
       {
-        id,
-        data: {
-          licenceImageFront: currentFront ?? undefined,
-          licenceImageBack: currentBack ?? undefined,
-        },
-      },
-      {
-        onSuccess: (updated) => {
-          queryClient.setQueryData(getGetApplicationQueryKey(id), updated);
-          setImageFront(undefined); // reset local override
+        onSuccess: (u) => {
+          invalidate(u);
+          setImageFront(undefined);
           setImageBack(undefined);
-          setImageSaved(true);
-          setTimeout(() => setImageSaved(false), 3000);
+          flash(setImagesSaved);
         }
       }
     );
   };
 
-  const imagesDirty =
-    (imageFront !== undefined && imageFront !== (app?.licenceImageFront ?? null)) ||
-    (imageBack !== undefined && imageBack !== (app?.licenceImageBack ?? null));
+  const handleStatusChange = (newStatus: 'registered' | 'pending_payment' | 'processing' | 'processed') => {
+    updateMutation.mutate(
+      { id, data: { status: newStatus } },
+      { onSuccess: invalidate }
+    );
+  };
 
-  if (isLoading) {
+  if (isLoading || !applicant || !licence || !notes) {
     return (
       <AdminLayout>
         <Skeleton className="h-8 w-32 mb-8" />
@@ -198,6 +268,7 @@ export function ApplicationDetail() {
 
   return (
     <AdminLayout>
+      {/* Header */}
       <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <Link href="/admin/applications" className="text-slate-500 hover:text-gov-blue text-sm font-bold flex items-center gap-1 mb-2">
@@ -226,7 +297,7 @@ export function ApplicationDetail() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
 
-          {/* Applicant details */}
+          {/* ── Applicant Details ── */}
           <Card className="shadow-md border-0 overflow-hidden">
             <div className="bg-gov-blue h-1 w-full" />
             <CardHeader className="bg-white border-b border-slate-100 pb-4">
@@ -234,39 +305,62 @@ export function ApplicationDetail() {
                 <User className="h-5 w-5 text-gov-blue" /> Applicant Details
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-6">
-              <div className="grid sm:grid-cols-2 gap-x-8 gap-y-6">
-                <div>
-                  <p className="text-sm font-bold text-slate-500 mb-1">Full Name</p>
-                  <p className="text-lg font-bold text-slate-900">{app.fullName}</p>
+            <CardContent className="p-6 space-y-4">
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <Label className="font-bold text-slate-700">Full Name</Label>
+                  <Input
+                    value={applicant.fullName}
+                    onChange={(e) => setApplicant(p => p && ({ ...p, fullName: e.target.value }))}
+                    className="bg-slate-50"
+                    placeholder="Full legal name"
+                  />
                 </div>
-                <div>
-                  <p className="text-sm font-bold text-slate-500 mb-1">Date of Birth</p>
-                  <p className="text-lg font-medium text-slate-900">{formatDate(app.dateOfBirth)}</p>
+                <div className="space-y-1.5">
+                  <Label className="font-bold text-slate-700">Date of Birth</Label>
+                  <Input
+                    type="date"
+                    value={applicant.dateOfBirth}
+                    onChange={(e) => setApplicant(p => p && ({ ...p, dateOfBirth: e.target.value }))}
+                    className="bg-slate-50"
+                  />
                 </div>
-                {app.email && (
-                  <div className="flex items-center gap-2">
-                    <Mail className="h-4 w-4 text-slate-400" />
-                    <div>
-                      <p className="text-sm font-bold text-slate-500 mb-1">Email</p>
-                      <p className="font-medium text-slate-900">{app.email}</p>
-                    </div>
-                  </div>
-                )}
-                {app.phone && (
-                  <div className="flex items-center gap-2">
-                    <Phone className="h-4 w-4 text-slate-400" />
-                    <div>
-                      <p className="text-sm font-bold text-slate-500 mb-1">Phone</p>
-                      <p className="font-medium text-slate-900">{app.phone}</p>
-                    </div>
-                  </div>
-                )}
+                <div className="space-y-1.5">
+                  <Label className="font-bold text-slate-700">Email Address</Label>
+                  <Input
+                    type="email"
+                    value={applicant.email}
+                    onChange={(e) => setApplicant(p => p && ({ ...p, email: e.target.value }))}
+                    className="bg-slate-50"
+                    placeholder="optional"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="font-bold text-slate-700">Phone Number</Label>
+                  <Input
+                    type="tel"
+                    value={applicant.phone}
+                    onChange={(e) => setApplicant(p => p && ({ ...p, phone: e.target.value }))}
+                    className="bg-slate-50"
+                    placeholder="optional"
+                  />
+                </div>
+              </div>
+              <div className="flex items-center gap-3 pt-2">
+                <Button
+                  onClick={handleSaveApplicant}
+                  disabled={updateMutation.isPending}
+                  className="bg-gov-blue hover:bg-blue-800 text-white font-bold"
+                >
+                  <Save className="h-4 w-4 mr-1.5" />
+                  {updateMutation.isPending ? 'Saving…' : 'Save Details'}
+                </Button>
+                <SavedBadge show={applicantSaved} />
               </div>
             </CardContent>
           </Card>
 
-          {/* Licence images — admin upload */}
+          {/* ── Licence Images ── */}
           <Card className="shadow-md border-0 overflow-hidden">
             <CardHeader className="bg-white border-b border-slate-100 pb-4">
               <CardTitle className="text-xl font-bold flex items-center gap-2">
@@ -281,12 +375,12 @@ export function ApplicationDetail() {
                 <ImageSlot
                   label="Front of licence"
                   value={currentFront}
-                  onChange={(v) => { setImageFront(v); setImageSaved(false); }}
+                  onChange={(v) => { setImageFront(v); setImagesSaved(false); }}
                 />
                 <ImageSlot
                   label="Back of licence"
                   value={currentBack}
-                  onChange={(v) => { setImageBack(v); setImageSaved(false); }}
+                  onChange={(v) => { setImageBack(v); setImagesSaved(false); }}
                 />
               </div>
               <div className="flex items-center gap-3">
@@ -295,16 +389,15 @@ export function ApplicationDetail() {
                   disabled={updateMutation.isPending || (!imagesDirty && !currentFront && !currentBack)}
                   className="bg-gov-blue hover:bg-blue-800 text-white font-bold"
                 >
-                  {updateMutation.isPending ? 'Saving…' : 'Save images'}
+                  <Save className="h-4 w-4 mr-1.5" />
+                  {updateMutation.isPending ? 'Saving…' : 'Save Images'}
                 </Button>
-                {imageSaved && (
-                  <span className="text-gov-green font-bold text-sm">✓ Images saved</span>
-                )}
+                <SavedBadge show={imagesSaved} />
               </div>
             </CardContent>
           </Card>
 
-          {/* Admin notes */}
+          {/* ── Admin Notes ── */}
           <Card className="shadow-md border-0 overflow-hidden">
             <CardHeader className="bg-white border-b border-slate-100 pb-4">
               <CardTitle className="text-xl font-bold flex items-center gap-2">
@@ -312,82 +405,120 @@ export function ApplicationDetail() {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6 space-y-4">
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <Label className="font-bold text-slate-700">Notes</Label>
                 <Textarea
-                  value={currentNotes}
-                  onChange={(e) => setNotesValue(e.target.value)}
+                  value={notes.notes}
+                  onChange={(e) => setNotes(p => p && ({ ...p, notes: e.target.value }))}
                   className="bg-slate-50 min-h-[100px]"
                   placeholder="Add any notes about this application..."
                 />
               </div>
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <Label className="font-bold text-slate-700">Estimated Completion Date</Label>
                 <Input
                   type="date"
-                  value={currentEst}
-                  onChange={(e) => setEstCompletion(e.target.value)}
+                  value={notes.estimatedCompletion}
+                  onChange={(e) => setNotes(p => p && ({ ...p, estimatedCompletion: e.target.value }))}
                   className="bg-slate-50 max-w-xs"
                 />
               </div>
-              <Button
-                onClick={handleSaveNotes}
-                disabled={updateMutation.isPending}
-                className="bg-gov-blue hover:bg-blue-800 text-white font-bold"
-              >
-                {updateMutation.isPending ? 'Saving...' : 'Save Notes'}
-              </Button>
+              <div className="flex items-center gap-3 pt-1">
+                <Button
+                  onClick={handleSaveNotes}
+                  disabled={updateMutation.isPending}
+                  className="bg-gov-blue hover:bg-blue-800 text-white font-bold"
+                >
+                  <Save className="h-4 w-4 mr-1.5" />
+                  {updateMutation.isPending ? 'Saving…' : 'Save Notes'}
+                </Button>
+                <SavedBadge show={notesSaved} />
+              </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Sidebar */}
+        {/* ── Sidebar: Licence Info ── */}
         <div className="space-y-6">
           <Card className="shadow-md border-0 overflow-hidden">
+            <div className="bg-slate-700 h-1 w-full" />
             <CardHeader className="bg-slate-50 border-b border-slate-100 pb-4">
               <CardTitle className="text-lg font-bold flex items-center gap-2">
-                <CreditCard className="h-5 w-5 text-slate-600" /> Application Info
+                <CreditCard className="h-5 w-5 text-slate-600" /> Licence Info
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6 space-y-4">
-              <div>
-                <p className="text-sm font-bold text-slate-500 mb-1">Licence Type</p>
-                <Badge variant="outline" className="text-sm font-bold px-3 py-1 border-slate-300">
-                  {LICENCE_TYPE_LABELS[app.licenceType] ?? app.licenceType}
-                </Badge>
+              <div className="space-y-1.5">
+                <Label className="font-bold text-slate-700">Licence Type</Label>
+                <Select
+                  value={licence.licenceType}
+                  onValueChange={(v) => setLicence(p => p && ({ ...p, licenceType: v as Application['licenceType'] }))}
+                >
+                  <SelectTrigger className="bg-white font-medium text-sm">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="provisional">Provisional</SelectItem>
+                    <SelectItem value="full_car">Full Car (B)</SelectItem>
+                    <SelectItem value="full_motorcycle">Full Motorcycle (A)</SelectItem>
+                    <SelectItem value="full_lorry">Full Lorry (C)</SelectItem>
+                    <SelectItem value="full_bus">Full Bus (D)</SelectItem>
+                    <SelectItem value="full_minibus">Full Minibus (D1)</SelectItem>
+                    <SelectItem value="international">International (IDP)</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-              {app.referenceNumber && (
-                <div>
-                  <p className="text-sm font-bold text-slate-500 mb-1">Reference / Licence No.</p>
-                  <p className="font-mono font-bold text-slate-900 tracking-widest">{app.referenceNumber}</p>
-                </div>
-              )}
-              {app.licenceCategory && (
-                <div>
-                  <p className="text-sm font-bold text-slate-500 mb-1">Category</p>
-                  <p className="font-mono font-bold text-slate-900">{app.licenceCategory}</p>
-                </div>
-              )}
-              <div className="pt-4 border-t border-slate-100">
-                <p className="text-sm font-bold text-slate-500 mb-1">Submitted</p>
-                <p className="font-medium text-slate-900 flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-slate-400" />
-                  {formatDate(app.submittedAt)}
-                </p>
+
+              <div className="space-y-1.5">
+                <Label className="font-bold text-slate-700">Category</Label>
+                <Input
+                  value={licence.licenceCategory}
+                  onChange={(e) => setLicence(p => p && ({ ...p, licenceCategory: e.target.value }))}
+                  className="bg-white text-sm"
+                  placeholder="e.g. A, B"
+                />
               </div>
-              <div>
-                <p className="text-sm font-bold text-slate-500 mb-1">Last Updated</p>
-                <p className="font-medium text-slate-900 flex items-center gap-2">
-                  <Activity className="h-4 w-4 text-slate-400" />
-                  {formatDate(app.updatedAt)}
-                </p>
+
+              <div className="space-y-1.5">
+                <Label className="font-bold text-slate-700">Reference / Licence No.</Label>
+                <Input
+                  value={licence.referenceNumber}
+                  onChange={(e) => setLicence(p => p && ({ ...p, referenceNumber: e.target.value.toUpperCase() }))}
+                  className="bg-white font-mono text-sm tracking-widest"
+                  placeholder="optional"
+                />
               </div>
-              {app.estimatedCompletion && (
+
+              <div className="flex items-center gap-3 pt-1">
+                <Button
+                  onClick={handleSaveLicence}
+                  disabled={updateMutation.isPending}
+                  size="sm"
+                  className="bg-gov-blue hover:bg-blue-800 text-white font-bold"
+                >
+                  <Save className="h-3.5 w-3.5 mr-1.5" />
+                  {updateMutation.isPending ? 'Saving…' : 'Save'}
+                </Button>
+                <SavedBadge show={licenceSaved} />
+              </div>
+
+              {/* Read-only timestamps */}
+              <div className="pt-4 border-t border-slate-100 space-y-3">
                 <div>
-                  <p className="text-sm font-bold text-slate-500 mb-1">Est. Completion</p>
-                  <p className="font-medium text-slate-900">{formatDate(app.estimatedCompletion)}</p>
+                  <p className="text-sm font-bold text-slate-500 mb-1">Submitted</p>
+                  <p className="font-medium text-slate-900 flex items-center gap-2 text-sm">
+                    <Calendar className="h-4 w-4 text-slate-400" />
+                    {formatDate(app.submittedAt)}
+                  </p>
                 </div>
-              )}
+                <div>
+                  <p className="text-sm font-bold text-slate-500 mb-1">Last Updated</p>
+                  <p className="font-medium text-slate-900 flex items-center gap-2 text-sm">
+                    <Activity className="h-4 w-4 text-slate-400" />
+                    {formatDate(app.updatedAt)}
+                  </p>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
