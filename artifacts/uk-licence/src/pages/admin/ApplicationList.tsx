@@ -4,20 +4,32 @@ import { AdminLayout } from '@/components/AdminLayout';
 import {
   useListApplications,
   getListApplicationsQueryKey,
+  useDeleteApplication,
 } from '@workspace/api-client-react';
+import { useQueryClient } from '@tanstack/react-query';
 import { cn, formatDate } from '@/lib/utils';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Search, Plus, Filter, FileText, ChevronRight } from 'lucide-react';
+import { Search, Plus, Filter, FileText, ChevronRight, Trash2 } from 'lucide-react';
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 const LICENCE_TYPE_LABELS: Record<string, string> = {
   provisional: 'Provisional',
@@ -32,11 +44,23 @@ const LICENCE_TYPE_LABELS: Record<string, string> = {
 export function ApplicationList() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [deleteTarget, setDeleteTarget] = useState<{ id: number; name: string } | null>(null);
+
+  const queryClient = useQueryClient();
 
   const { data: applications, isLoading, isError } = useListApplications(
     undefined,
     { query: { queryKey: getListApplicationsQueryKey() } }
   );
+
+  const { mutate: deleteApplication, isPending: isDeleting } = useDeleteApplication({
+    mutation: {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: getListApplicationsQueryKey() });
+        setDeleteTarget(null);
+      },
+    },
+  });
 
   const filteredApps = useMemo(() => {
     if (!applications) return [];
@@ -45,7 +69,7 @@ export function ApplicationList() {
       const matchesSearch = !q ||
         app.trackingCode.toLowerCase().includes(q) ||
         app.fullName.toLowerCase().includes(q) ||
-        app.email.toLowerCase().includes(q);
+        (app.email ?? '').toLowerCase().includes(q);
       const matchesStatus = statusFilter === 'all' || app.status === statusFilter;
       return matchesSearch && matchesStatus;
     });
@@ -127,7 +151,7 @@ export function ApplicationList() {
                     <TableHead className="font-bold text-slate-900 w-[120px]">Type</TableHead>
                     <TableHead className="font-bold text-slate-900 w-[150px]">Status</TableHead>
                     <TableHead className="font-bold text-slate-900 w-[140px]">Date Submitted</TableHead>
-                    <TableHead className="w-[60px]"></TableHead>
+                    <TableHead className="w-[100px]"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -141,12 +165,26 @@ export function ApplicationList() {
                       <TableCell>{getStatusBadge(app.status)}</TableCell>
                       <TableCell className="text-slate-600 text-sm">{formatDate(app.submittedAt)}</TableCell>
                       <TableCell className="text-right">
-                        <Link
-                          href={`/admin/applications/${app.id}`}
-                          className={cn(buttonVariants({ variant: 'ghost', size: 'icon' }), 'group-hover:bg-blue-100 group-hover:text-gov-blue transition-colors inline-flex')}
-                        >
-                          <ChevronRight className="h-5 w-5" />
-                        </Link>
+                        <div className="flex items-center justify-end gap-1">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-100 hover:text-red-600 text-slate-400"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              setDeleteTarget({ id: app.id, name: app.fullName });
+                            }}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                          <Link
+                            href={`/admin/applications/${app.id}`}
+                            className={cn(buttonVariants({ variant: 'ghost', size: 'icon' }), 'group-hover:bg-blue-100 group-hover:text-gov-blue transition-colors inline-flex')}
+                          >
+                            <ChevronRight className="h-5 w-5" />
+                          </Link>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -156,6 +194,29 @@ export function ApplicationList() {
           )}
         </div>
       </Card>
+
+      <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Application</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete the application for{' '}
+              <span className="font-semibold text-slate-900">{deleteTarget?.name}</span>?
+              This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-red-600 hover:bg-red-700 text-white"
+              disabled={isDeleting}
+              onClick={() => deleteTarget && deleteApplication({ id: deleteTarget.id })}
+            >
+              {isDeleting ? 'Deleting…' : 'Delete'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AdminLayout>
   );
 }
