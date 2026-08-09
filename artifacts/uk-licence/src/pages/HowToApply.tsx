@@ -8,6 +8,23 @@ import { ChevronRight, FileText, CheckCircle2, User, CreditCard } from 'lucide-r
 export function HowToApply() {
   return (
     <Layout>
+      {/* Hero image banner */}
+      <div className="relative w-full h-56 sm:h-72 overflow-hidden">
+        <img
+          src="/img/driving-lesson.jpg"
+          alt="Person during a UK driving lesson"
+          className="w-full h-full object-cover object-center"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-900/70 via-slate-900/40 to-transparent flex items-end">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl pb-8">
+            <p className="text-white/80 text-sm font-semibold uppercase tracking-widest mb-1">DVLA</p>
+            <h1 className="text-3xl sm:text-4xl font-black text-white leading-tight">
+              Apply for your first provisional driving licence
+            </h1>
+          </div>
+        </div>
+      </div>
+
       <div className="bg-white py-8 sm:py-12">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
           
@@ -15,9 +32,6 @@ export function HowToApply() {
             <Link href="/" className="text-gov-blue hover:underline text-sm font-medium mb-4 inline-block">
               ← Back
             </Link>
-            <h1 className="text-4xl sm:text-5xl font-black text-slate-900 mb-6 tracking-tight">
-              Apply for your first provisional driving licence
-            </h1>
             <p className="text-xl text-slate-700 leading-relaxed">
               Find out what you need, how much it costs, and how to apply for a provisional UK driving licence.
             </p>

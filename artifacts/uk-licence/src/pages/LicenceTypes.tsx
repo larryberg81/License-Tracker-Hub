@@ -15,6 +15,22 @@ import { motion } from 'framer-motion';
 export function LicenceTypes() {
   return (
     <Layout>
+      {/* Hero image banner */}
+      <div className="relative w-full h-48 sm:h-64 overflow-hidden">
+        <img
+          src="/img/roundabout.jpg"
+          alt="UK roundabout aerial view"
+          className="w-full h-full object-cover object-center"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-900/50 to-slate-900/20 flex items-end">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl pb-6">
+            <h1 className="text-3xl sm:text-4xl font-black text-white leading-tight drop-shadow">
+              Driving licence categories
+            </h1>
+          </div>
+        </div>
+      </div>
+
       <div className="bg-white py-8 sm:py-12">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
           
@@ -22,9 +38,6 @@ export function LicenceTypes() {
             <Link href="/" className="text-gov-blue hover:underline text-sm font-medium mb-4 inline-block">
               ← Back
             </Link>
-            <h1 className="text-4xl sm:text-5xl font-black text-slate-900 mb-6 tracking-tight">
-              Driving licence categories
-            </h1>
             <p className="text-xl text-slate-700 leading-relaxed mb-8">
               Find out what vehicles you can drive and what the different categories on your driving licence mean.
             </p>
