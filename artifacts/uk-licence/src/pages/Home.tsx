@@ -294,22 +294,9 @@ export function Home() {
               </div>
             </motion.div>
 
-            <div className="hidden md:flex justify-center lg:justify-end items-center relative py-8">
-              <div className="relative">
-                <img
-                  src="/img/hero-road.jpg"
-                  alt="UK motorway at golden hour"
-                  className="rounded-2xl shadow-2xl w-full max-w-lg object-cover h-72 lg:h-80"
-                />
-                {/* Licence card overlay */}
-                <div className="absolute -bottom-6 -left-6 shadow-2xl rounded-xl overflow-hidden border-4 border-white w-52">
-                  <img
-                    src="/img/licence-card.jpg"
-                    alt="UK photocard driving licence"
-                    className="w-full h-auto object-cover"
-                  />
-                </div>
-              </div>
+            <div className="hidden md:flex justify-center lg:justify-end items-center relative py-12">
+              <div className="absolute inset-0 bg-blue-50/50 rounded-full blur-3xl transform scale-150 -z-10" />
+              <LicenceCard className="rotate-3 lg:rotate-6 transform hover:rotate-0 transition-transform duration-500 z-10" />
             </div>
           </div>
         </div>
