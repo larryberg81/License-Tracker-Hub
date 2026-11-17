@@ -8,23 +8,6 @@ import { ChevronRight, FileText, CheckCircle2, User, CreditCard } from 'lucide-r
 export function HowToApply() {
   return (
     <Layout>
-      {/* Hero image banner */}
-      <div className="relative w-full h-56 sm:h-72 overflow-hidden">
-        <img
-          src="/img/driving-lesson.jpg"
-          alt="Person during a UK driving lesson"
-          className="w-full h-full object-cover object-center"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-900/70 via-slate-900/40 to-transparent flex items-end">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl pb-8">
-            <p className="text-white/80 text-sm font-semibold uppercase tracking-widest mb-1">DVLA</p>
-            <h1 className="text-3xl sm:text-4xl font-black text-white leading-tight">
-              Apply for your first provisional driving licence
-            </h1>
-          </div>
-        </div>
-      </div>
-
       <div className="bg-white py-8 sm:py-12">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
           
@@ -32,8 +15,9 @@ export function HowToApply() {
             <Link href="/" className="text-gov-blue hover:underline text-sm font-medium mb-4 inline-block">
               ← Back
             </Link>
+            <h1 className="text-4xl font-black mb-6">Provisional licence application guidance</h1>
             <p className="text-xl text-slate-700 leading-relaxed">
-              Find out what you need, how much it costs, and how to apply for a provisional UK driving licence.
+              Independent guidance to help you prepare for an official application. Apply directly on GOV.UK; this site does not submit applications to DVLA.
             </p>
           </div>
 
@@ -42,11 +26,11 @@ export function HowToApply() {
             <div className="grid sm:grid-cols-2 gap-4 text-sm">
               <div className="flex gap-2">
                 <CreditCard className="h-5 w-5 text-slate-500 shrink-0" />
-                <span><strong className="block text-slate-900 text-base">£34.00</strong> when applying online</span>
+                <span><strong className="block text-slate-900 text-base">Official application fee</strong> Check the current fee on GOV.UK. No payment is collected here.</span>
               </div>
               <div className="flex gap-2">
                 <FileText className="h-5 w-5 text-slate-500 shrink-0" />
-                <span><strong className="block text-slate-900 text-base">1 week</strong> usual processing time</span>
+                <span><strong className="block text-slate-900 text-base">DVLA processing times</strong> Confirm current estimates on GOV.UK. We cannot guarantee a completion date.</span>
               </div>
             </div>
           </div>
@@ -89,17 +73,17 @@ export function HowToApply() {
               It's faster and cheaper to apply online. Have your documents and payment card ready.
             </p>
 
-            <Link href="/" className={cn(buttonVariants({ size: "lg" }), "inline-flex mt-4 mb-12 bg-gov-green hover:bg-green-700 text-white font-bold text-lg px-8 shadow-md")}>
-              Start application
+            <a href="https://www.gov.uk/apply-first-provisional-driving-licence" className={cn(buttonVariants({ size: "lg" }), "inline-flex mt-4 mb-12 bg-gov-green hover:bg-green-700 text-white font-bold text-lg px-8 shadow-md")}>
+              Apply directly on GOV.UK
               <ChevronRight className="ml-2 h-5 w-5" />
-            </Link>
+            </a>
 
             <h2 className="text-2xl font-bold text-slate-900 mb-4 border-t border-slate-200 pt-10">Apply by post</h2>
             <p className="text-slate-700 mb-4">
               You can apply by post by completing a D1 form 'Application for a driving licence'.
             </p>
             <p className="text-slate-700 mb-4">
-              You can get a form from most Post Offices or order one online from the DVLA. It costs £43 to apply by post and takes longer.
+              Check GOV.UK for current D1 form availability, postal fees and processing times before applying.
             </p>
           </div>
         </div>

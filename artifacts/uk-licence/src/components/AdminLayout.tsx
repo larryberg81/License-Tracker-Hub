@@ -3,12 +3,13 @@ import { Link, useLocation } from 'wouter';
 import { cn } from '@/lib/utils';
 import { ShieldCheck, LayoutDashboard, Users, FileText, Settings, LogOut, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useQueryClient } from '@tanstack/react-query';
 
 export function AdminLayout({ children }: { children: React.ReactNode }) {
   const [location, setLocation] = useLocation();
+  const queryClient = useQueryClient();
 
-  // Simple unauthenticated check for demo purposes
-  // In a real app, verify the token's validity using an API endpoint
+  // This is a navigation guard only. The server verifies every admin request.
   useEffect(() => {
     const token = localStorage.getItem('admin_token');
     if (!token && location !== '/admin') {
@@ -18,6 +19,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
 
   const handleLogout = () => {
     localStorage.removeItem('admin_token');
+    queryClient.clear();
     setLocation('/admin');
   };
 

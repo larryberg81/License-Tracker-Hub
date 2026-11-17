@@ -28,7 +28,7 @@ function applyWatermark(src: string): Promise<string> {
       const ctx = canvas.getContext('2d')!;
       ctx.drawImage(img, 0, 0);
 
-      const text = 'UK DVLA';
+      const text = 'ASSISTANCE COPY';
       const fontSize = Math.max(24, Math.round(img.width / 12));
       ctx.font = `bold ${fontSize}px Arial, sans-serif`;
       ctx.fillStyle = 'rgba(255,255,255,0.55)';
@@ -360,7 +360,7 @@ export function NewApplication() {
                   <h3 className="font-bold text-slate-800 text-base">Licence Images (optional)</h3>
                 </div>
                 <p className="text-sm text-slate-500 mb-4">
-                  Upload front and back of the driving licence. A <strong>UK DVLA</strong> watermark will be applied automatically.
+                  Upload only documents you are authorised to handle. An <strong>ASSISTANCE COPY</strong> watermark will be applied automatically. Documents are not displayed on public tracking pages.
                 </p>
                 <div className="grid sm:grid-cols-2 gap-6">
                   <ImageSlot label="Front of licence" value={imageFront} onChange={setImageFront} />

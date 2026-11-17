@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from 'wouter';
 import { Layout } from '@/components/Layout';
-import { LicenceCard } from '@/components/LicenceCard';
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import {
@@ -31,12 +30,12 @@ import { motion } from 'framer-motion';
 const popularServices = [
   { label: 'Learn to drive a car: step by step', href: '/how-to-apply' },
   { label: 'Apply for your first provisional driving licence', href: '/how-to-apply' },
-  { label: 'View or share your driving licence information', href: '/track' },
-  { label: 'Tell DVLA you\'ve changed your address', href: '/contact' },
+  { label: 'View or share your driving licence information on GOV.UK', href: 'https://www.gov.uk/view-driving-licence' },
+  { label: 'Change your address directly with DVLA', href: 'https://www.gov.uk/change-address-driving-licence' },
   { label: 'Replace a lost, stolen, damaged or destroyed driving licence', href: '/how-to-apply' },
   { label: 'Renew your driving licence', href: '/how-to-apply' },
-  { label: 'Track your driving licence application', href: '/track' },
-  { label: 'Contact DVLA', href: '/contact' },
+  { label: 'Track your independent assistance case', href: '/track' },
+  { label: 'Contact DVLA directly on GOV.UK', href: 'https://www.gov.uk/contact-the-dvla' },
 ];
 
 const sections = [
@@ -76,10 +75,10 @@ const sections = [
     bg: 'bg-indigo-50',
     border: 'border-indigo-200',
     items: [
-      { label: 'View or share your driving licence information', href: '/track', desc: 'Check your personal driving record and share it with employers or hire companies.' },
+      { label: 'View or share your driving licence information on GOV.UK', href: 'https://www.gov.uk/view-driving-licence', desc: 'Use the official government service to check your driving record.' },
       { label: 'Check what vehicles you can drive', href: '/licence-types', desc: 'Find out which vehicle categories you are licensed for.' },
       { label: 'Add new vehicle categories to your licence', href: '/how-to-apply', desc: 'Pass additional tests to drive lorries, minibuses or motorcycles.' },
-      { label: 'Track your application', href: '/track', desc: 'Check the progress of a licence application made online or by post.' },
+      { label: 'Track your assistance case', href: '/track', desc: 'Check updates entered by our independent team, not official DVLA application status.' },
     ],
   },
   {
@@ -92,7 +91,7 @@ const sections = [
     items: [
       { label: 'Book your theory test', href: '/how-to-apply', desc: 'Book, change or cancel a theory test.' },
       { label: 'Book your driving test', href: '/how-to-apply', desc: 'Book, change or cancel a practical driving test.' },
-      { label: 'Check your driving test appointment', href: '/track', desc: 'View the details of your booked test.' },
+      { label: 'Driving tests on GOV.UK', href: 'https://www.gov.uk/browse/driving/driving-tests-learning-to-drive', desc: 'Use the official government service for driving tests and appointments.' },
       { label: 'Check a driving instructor\'s licence', href: '/how-to-apply', desc: 'Find out if a driving instructor is registered with DVSA.' },
     ],
   },
@@ -130,8 +129,8 @@ const infoBoxes = [
   {
     icon: Clock,
     title: 'Apply online — fastest option',
-    body: 'Applying online is the quickest way to get your driving licence. Most online applications are processed within one week.',
-    cta: 'Start your application',
+    body: 'Read our guidance before applying directly through GOV.UK. DVLA makes all licensing decisions and sets processing times.',
+    cta: 'Read application guidance',
     href: '/how-to-apply',
     accent: 'border-gov-blue',
     iconColor: 'text-gov-blue',
@@ -139,8 +138,8 @@ const infoBoxes = [
   {
     icon: Search,
     title: 'Already applied?',
-    body: 'Use your unique tracking reference number to check the current status of your driving licence application at any time.',
-    cta: 'Track my application',
+    body: 'Use a reference supplied by our team to check your independent assistance case. This is not the DVLA application tracker.',
+    cta: 'Track my assistance case',
     href: '/track',
     accent: 'border-gov-green',
     iconColor: 'text-gov-green',
@@ -148,9 +147,9 @@ const infoBoxes = [
   {
     icon: Phone,
     title: 'Need help?',
-    body: 'Call the DVLA contact centre on 0300 790 6801, Monday to Friday 8am to 7pm, Saturday 8am to 2pm.',
-    cta: 'Contact DVLA',
-    href: '/contact',
+    body: 'For an official licensing question or decision, contact DVLA directly using the contact details on GOV.UK.',
+    cta: 'Official contact information',
+    href: 'https://www.gov.uk/contact-the-dvla',
     accent: 'border-slate-400',
     iconColor: 'text-slate-600',
   },
@@ -160,71 +159,6 @@ const infoBoxes = [
 /* Component                                                            */
 /* ------------------------------------------------------------------ */
 
-/* ── Royal Coat of Arms SVG (DVLA / GOV.UK style) ── */
-function RoyalArms({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 120 130" className={className} aria-hidden="true" fill="none" xmlns="http://www.w3.org/2000/svg">
-      {/* Crown */}
-      <rect x="36" y="8" width="48" height="9" rx="1.5" fill="#1a1a1a"/>
-      <circle cx="60" cy="6" r="4" fill="#1a1a1a"/>
-      <rect x="57.5" y="2" width="5" height="8" fill="#1a1a1a"/>
-      <rect x="54" y="4" width="12" height="4" fill="#1a1a1a"/>
-      <circle cx="36" cy="13" r="3.5" fill="#1a1a1a"/>
-      <rect x="33.5" y="4" width="5" height="9" fill="#1a1a1a"/>
-      <rect x="30" y="7" width="12" height="4" fill="#1a1a1a"/>
-      <circle cx="84" cy="13" r="3.5" fill="#1a1a1a"/>
-      <rect x="81.5" y="4" width="5" height="9" fill="#1a1a1a"/>
-      <rect x="78" y="7" width="12" height="4" fill="#1a1a1a"/>
-      <path d="M36 17 L36 13 L84 13 L84 17 Z" fill="#1a1a1a"/>
-
-      {/* Shield */}
-      <path d="M28 20 L28 72 Q28 90 60 100 Q92 90 92 72 L92 20 Z" fill="#f5f0e8" stroke="#1a1a1a" strokeWidth="2"/>
-      {/* Shield quarters — top divider */}
-      <line x1="60" y1="20" x2="60" y2="100" stroke="#1a1a1a" strokeWidth="1.5"/>
-      <line x1="28" y1="60" x2="92" y2="60" stroke="#1a1a1a" strokeWidth="1.5"/>
-
-      {/* Q1: England — 3 lions (simplified) */}
-      <rect x="31" y="22" width="26" height="36" rx="0" fill="#c8102e" opacity="0.85"/>
-      <text x="44" y="43" textAnchor="middle" fontSize="22" fill="#f5c518" fontWeight="bold">♛</text>
-
-      {/* Q2: Scotland — rampant lion */}
-      <rect x="62" y="22" width="26" height="36" rx="0" fill="#f5c518" opacity="0.9"/>
-      <text x="75" y="43" textAnchor="middle" fontSize="18" fill="#c8102e" fontWeight="bold">♞</text>
-
-      {/* Q3: Ireland — harp */}
-      <rect x="62" y="62" width="26" height="36" rx="0" fill="#c8102e" opacity="0.85"/>
-      <text x="75" y="83" textAnchor="middle" fontSize="18" fill="#f5c518" fontWeight="bold">♜</text>
-
-      {/* Q4: France (historical) */}
-      <rect x="31" y="62" width="26" height="36" rx="0" fill="#00338d" opacity="0.7"/>
-      <text x="44" y="83" textAnchor="middle" fontSize="14" fill="#f5c518" fontWeight="bold">⚜</text>
-
-      {/* Shield border overlay */}
-      <path d="M28 20 L28 72 Q28 90 60 100 Q92 90 92 72 L92 20 Z" fill="none" stroke="#1a1a1a" strokeWidth="2"/>
-
-      {/* Garter belt around shield */}
-      <path d="M22 60 Q22 95 60 108 Q98 95 98 60 L98 20 Q98 16 94 16 L26 16 Q22 16 22 20 Z" fill="none" stroke="#1a1a1a" strokeWidth="1" opacity="0.3"/>
-
-      {/* Left supporter — Lion */}
-      <ellipse cx="14" cy="72" rx="10" ry="14" fill="#c8a43a" opacity="0.9"/>
-      <circle cx="14" cy="58" r="7" fill="#c8a43a" opacity="0.9"/>
-      <path d="M8 55 Q6 50 10 48 Q14 46 18 50" fill="#c8a43a" opacity="0.9"/>
-      <path d="M4 72 Q4 85 14 88 Q24 85 24 72" fill="#c8a43a" opacity="0.9"/>
-
-      {/* Right supporter — Unicorn */}
-      <ellipse cx="106" cy="72" rx="10" ry="14" fill="#e8e8e8" opacity="0.9"/>
-      <circle cx="106" cy="58" r="7" fill="#e8e8e8" opacity="0.9"/>
-      <path d="M102 52 L106 44" stroke="#1a1a1a" strokeWidth="1.5" strokeLinecap="round"/>
-      <path d="M96 72 Q96 85 106 88 Q116 85 116 72" fill="#e8e8e8" opacity="0.9"/>
-
-      {/* Motto ribbon */}
-      <path d="M22 110 Q60 120 98 110" fill="none" stroke="#1a1a1a" strokeWidth="6" strokeLinecap="round"/>
-      <path d="M22 110 Q60 120 98 110" fill="none" stroke="#f5c518" strokeWidth="4" strokeLinecap="round"/>
-      <text x="60" y="113" textAnchor="middle" fontSize="4.5" fill="#1a1a1a" fontWeight="bold" letterSpacing="1">DIEU ET MON DROIT</text>
-    </svg>
-  );
-}
-
 export function Home() {
   return (
     <Layout>
@@ -233,24 +167,24 @@ export function Home() {
       <div className="bg-white border-b border-slate-200">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl py-3">
           <nav className="flex items-center gap-1.5 text-sm text-slate-600" aria-label="Breadcrumb">
-            <a href="https://www.gov.uk" className="text-slate-700 hover:underline">Home</a>
+            <Link href="/" className="text-slate-700 hover:underline">Home</Link>
             <ChevronRight className="h-3.5 w-3.5 text-slate-400 shrink-0" />
-            <span className="text-slate-700 underline cursor-default">Organisations</span>
+            <span className="text-slate-700">Independent licence assistance</span>
           </nav>
         </div>
       </div>
 
-      {/* ── DVLA Organisation Banner ── */}
+      {/* Independent service identity */}
       <div className="bg-white border-b border-slate-200">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl py-8">
           <div className="flex items-start gap-5">
             <div className="border-l-4 border-slate-800 pl-4 flex items-start gap-4">
-              <RoyalArms className="w-14 h-auto shrink-0 mt-0.5" />
+              <BookOpen className="w-10 h-10 shrink-0 mt-0.5 text-teal-700" />
               <div>
                 <h1 className="text-2xl font-bold text-slate-900 leading-tight">
-                  Driver &amp; Vehicle Licensing<br />Agency
+                  UK Licence Assistance
                 </h1>
-                <p className="text-sm text-slate-600 mt-1">Executive agency of the <span className="text-gov-blue hover:underline cursor-pointer">Department for Transport</span></p>
+                <p className="text-sm text-slate-600 mt-1">Independent guidance and assistance-case updates — not a government service.</p>
               </div>
             </div>
           </div>
@@ -268,13 +202,13 @@ export function Home() {
               className="max-w-2xl"
             >
               <p className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-3">
-                Driver &amp; Vehicle Licensing Agency
+                Independent guidance
               </p>
               <h1 className="text-4xl sm:text-5xl font-black text-slate-900 mb-4 leading-tight tracking-tight">
-                Driving licences
+                Help with driving licence applications
               </h1>
               <p className="text-xl text-slate-700 mb-8 leading-relaxed">
-                Apply for, renew or update your licence, view or share your driving licence, add new categories.
+                Understand the official application process and follow your assistance case. We do not issue licences, make DVLA decisions or provide access to government records.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4">
@@ -282,21 +216,26 @@ export function Home() {
                   href="/contact"
                   className={cn(buttonVariants({ size: 'lg' }), 'w-full sm:w-auto bg-gov-green hover:bg-green-700 text-white font-bold text-lg px-8 shadow-md inline-flex')}
                 >
-                  Start now
+                  Assistance information
                   <ChevronRight className="ml-2 h-5 w-5" />
                 </Link>
                 <Link
                   href="/track"
                   className={cn(buttonVariants({ size: 'lg', variant: 'outline' }), 'w-full sm:w-auto border-2 border-gov-blue text-gov-blue font-bold text-lg hover:bg-slate-50 inline-flex')}
                 >
-                  Track application
+                  Track assistance case
                 </Link>
               </div>
             </motion.div>
 
             <div className="hidden md:flex justify-center lg:justify-end items-center relative py-12">
               <div className="absolute inset-0 bg-blue-50/50 rounded-full blur-3xl transform scale-150 -z-10" />
-              <LicenceCard className="rotate-3 lg:rotate-6 transform hover:rotate-0 transition-transform duration-500 z-10" />
+              <div className="relative max-w-md rounded-xl border border-teal-200 bg-teal-50 p-8 shadow-sm">
+                <BookOpen className="h-12 w-12 text-teal-700 mb-4" />
+                <h2 className="text-2xl font-bold mb-3">You can apply directly</h2>
+                <p className="text-slate-700 mb-5">An assistance service is optional. Official applications, payments and licence decisions are handled by DVLA.</p>
+                <a href="https://www.gov.uk/browse/driving/driving-licences" className="font-bold text-gov-blue underline">Visit official GOV.UK licence services</a>
+              </div>
             </div>
           </div>
         </div>
@@ -305,7 +244,7 @@ export function Home() {
       {/* ── Popular services ── */}
       <div className="bg-slate-50 py-12 border-b border-slate-200">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
-          <h2 className="text-2xl font-black text-slate-900 mb-6">Popular services</h2>
+          <h2 className="text-2xl font-black text-slate-900 mb-6">Guidance and useful links</h2>
           <ul className="divide-y divide-slate-200 border-t border-b border-slate-200 bg-white">
             {popularServices.map((s) => (
               <li key={s.label}>
@@ -367,7 +306,7 @@ export function Home() {
                 {section.items.map((item) => (
                   <li key={item.label}>
                     <Link
-                      href={item.href}
+                      href={item.href === '/contact' ? 'https://www.gov.uk/contact-the-dvla' : item.href}
                       className="flex items-start gap-4 px-4 py-4 hover:bg-slate-50 group transition-colors"
                     >
                       <ArrowRight className={`h-4 w-4 ${section.color} shrink-0 mt-1 group-hover:translate-x-1 transition-transform`} />
@@ -409,17 +348,17 @@ export function Home() {
         </div>
       </div>
 
-      {/* ── DVLA notice ── */}
+      {/* Service information */}
       <div className="bg-white border-t border-slate-200 py-10">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
           <div className="flex flex-col sm:flex-row gap-6 text-sm text-slate-600">
             <div className="flex-1">
               <p className="font-bold text-slate-900 mb-1">From:</p>
-              <p>Driver and Vehicle Licensing Agency (DVLA) and Department for Transport</p>
+              <p>UK Licence Assistance, an independent service. Not affiliated with DVLA or the Department for Transport.</p>
             </div>
             <div className="flex-1">
-              <p className="font-bold text-slate-900 mb-1">Published:</p>
-              <p>20 June 2012 — last updated 17 July 2026</p>
+              <p className="font-bold text-slate-900 mb-1">Official applications:</p>
+              <a href="https://www.gov.uk/browse/driving/driving-licences" className="text-gov-blue underline">Apply directly through GOV.UK</a>
             </div>
             <div className="flex-1">
               <p className="font-bold text-slate-900 mb-1">Part of:</p>

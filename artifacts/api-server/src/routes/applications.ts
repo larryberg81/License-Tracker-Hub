@@ -1,6 +1,7 @@
 import { Router, type IRouter } from "express";
 import { eq, ilike, or, desc } from "drizzle-orm";
 import { db, applicationsTable } from "@workspace/db";
+import { createAdminToken, getAdminConfig, sameValue } from "../lib/admin-auth";
 import {
   TrackApplicationQueryParams,
   TrackApplicationResponse,
@@ -48,7 +49,7 @@ const STATUS_DESCRIPTIONS: Record<string, string> = {
   registered: "Your application has been received and registered in our system.",
   pending_payment: "Your application is awaiting payment. Please complete the payment to proceed.",
   processing: "Your application is being reviewed and processed by our team.",
-  processed: "Your application has been fully processed. Your licence will be dispatched shortly.",
+  processed: "Our assistance work is complete. This is not confirmation that DVLA has issued or dispatched a licence.",
 };
 
 const LICENCE_TYPE_LABELS: Record<string, string> = {
@@ -63,6 +64,7 @@ const LICENCE_TYPE_LABELS: Record<string, string> = {
 
 // Public tracking endpoint
 router.get("/applications/track", async (req, res): Promise<void> => {
+  res.setHeader("Cache-Control", "no-store");
   const parsed = TrackApplicationQueryParams.safeParse(req.query);
   if (!parsed.success) {
     res.status(400).json({ error: "Invalid query parameters" });
@@ -99,9 +101,10 @@ router.get("/applications/track", async (req, res): Promise<void> => {
     statusDescription: STATUS_DESCRIPTIONS[app.status] || "",
     submittedAt: app.submittedAt.toISOString(),
     estimatedCompletion: app.estimatedCompletion ?? null,
-    notes: app.notes ?? null,
-    licenceImageFront: app.licenceImageFront ?? null,
-    licenceImageBack: app.licenceImageBack ?? null,
+    // Internal notes and identity-document images are staff-only.
+    notes: null,
+    licenceImageFront: null,
+    licenceImageBack: null,
   });
   res.json(data);
 });
@@ -300,16 +303,18 @@ router.post("/admin/login", async (req, res): Promise<void> => {
     return;
   }
   const { username, password } = parsed.data;
-  const ADMIN_USERNAME = process.env.ADMIN_USERNAME || "admin";
-  const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "dvla_admin_2025";
-
-  if (username !== ADMIN_USERNAME || password !== ADMIN_PASSWORD) {
+  const config = getAdminConfig();
+  res.setHeader("Cache-Control", "no-store");
+  if (!config) {
+    res.status(503).json({ error: "Admin access is not configured. Set secure admin credentials and a SESSION_SECRET of at least 32 characters." });
+    return;
+  }
+  if (!sameValue(username, config.username) || !sameValue(password, config.password)) {
     res.status(401).json({ error: "Invalid username or password" });
     return;
   }
 
-  // Simple token: base64 encoded timestamp + credentials hash
-  const token = Buffer.from(`${username}:${Date.now()}:uk-licence-admin`).toString("base64");
+  const token = createAdminToken(config);
   const data = AdminLoginResponse.parse({ token, message: "Login successful" });
   res.json(data);
 });

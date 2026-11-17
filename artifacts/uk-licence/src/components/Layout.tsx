@@ -8,41 +8,22 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans text-slate-900 selection:bg-blue-200">
-      {/* UK Gov Style Header */}
-      <header className="bg-gov-blue text-white border-b-[10px] border-gov-green">
+      <header className="bg-slate-900 text-white border-b-4 border-teal-500">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3 hover:underline focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 focus:ring-offset-gov-blue">
-            {/* GOV.UK Tudor Crown SVG */}
-            <svg aria-hidden="true" focusable="false" className="h-9 w-auto" viewBox="0 0 132 97" fill="none" xmlns="http://www.w3.org/2000/svg">
-              {/* Base / band */}
-              <rect x="14" y="74" width="104" height="14" rx="2" fill="white"/>
-              {/* Crown body */}
-              <path d="M14 74 L14 52 L33 52 L33 38 L44 52 L66 28 L88 52 L99 38 L99 52 L118 52 L118 74 Z" fill="white"/>
-              {/* Arch left */}
-              <path d="M14 52 Q14 30 33 30 Q44 30 44 52" fill="none" stroke="white" strokeWidth="0"/>
-              {/* Orb top centre */}
-              <circle cx="66" cy="24" r="7" fill="white"/>
-              <rect x="63" y="8" width="6" height="16" rx="1" fill="white"/>
-              <rect x="58" y="13" width="16" height="5" rx="1" fill="white"/>
-              {/* Left fleur */}
-              <circle cx="14" cy="52" r="6" fill="white"/>
-              <rect x="11" y="36" width="6" height="16" rx="1" fill="white"/>
-              <rect x="7" y="41" width="14" height="5" rx="1" fill="white"/>
-              {/* Right fleur */}
-              <circle cx="118" cy="52" r="6" fill="white"/>
-              <rect x="115" y="36" width="6" height="16" rx="1" fill="white"/>
-              <rect x="111" y="41" width="14" height="5" rx="1" fill="white"/>
-              {/* Jewels on band */}
-              <circle cx="32" cy="81" r="4" fill="#1d4ed8"/>
-              <circle cx="66" cy="81" r="4" fill="#1d4ed8"/>
-              <circle cx="100" cy="81" r="4" fill="#1d4ed8"/>
-            </svg>
-            <span className="font-black text-[28px] leading-none tracking-tight" style={{ fontFamily: 'Arial, sans-serif', letterSpacing: '-0.01em' }}>
-              GOV<span className="text-gov-green mx-0.5">·</span>UK
+            <BookOpen className="h-8 w-8 shrink-0 text-teal-300" aria-hidden="true" />
+            <span className="font-bold text-xl sm:text-2xl leading-tight">
+              UK Licence Assistance
             </span>
           </Link>
         </div>
       </header>
+      <aside className="bg-amber-50 border-b border-amber-200" aria-label="Independent service notice">
+        <p className="container mx-auto px-4 sm:px-6 lg:px-8 py-3 text-sm text-slate-800">
+          <strong>Independent assistance service.</strong> Not DVLA, GOV.UK or a government agency. We do not issue driving licences.
+          {' '}You can apply directly through <a className="font-semibold underline" href="https://www.gov.uk/browse/driving/driving-licences">GOV.UK</a> without using this service.
+        </p>
+      </aside>
 
       {/* Main Navigation */}
       <div className="bg-white border-b border-slate-200">
@@ -81,7 +62,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         {children}
       </main>
 
-      {/* UK Gov Style Footer */}
+      {/* Independent service footer */}
       <footer className="bg-slate-200 border-t border-slate-300 py-12 mt-12">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
@@ -89,26 +70,25 @@ export function Layout({ children }: { children: React.ReactNode }) {
               <h3 className="font-bold text-slate-900 mb-4 text-lg">Services and information</h3>
               <ul className="space-y-2 text-sm text-slate-700">
                 <li><Link href="/" className="hover:underline hover:text-gov-blue">Driving and transport</Link></li>
-                <li><Link href="/" className="hover:underline hover:text-gov-blue">Benefits</Link></li>
-                <li><Link href="/" className="hover:underline hover:text-gov-blue">Businesses and self-employed</Link></li>
+                <li><Link href="/how-to-apply" className="hover:underline hover:text-gov-blue">Application guidance</Link></li>
+                <li><Link href="/track" className="hover:underline hover:text-gov-blue">Assistance case tracker</Link></li>
               </ul>
             </div>
             <div>
-              <h3 className="font-bold text-slate-900 mb-4 text-lg">Departments and policy</h3>
+              <h3 className="font-bold text-slate-900 mb-4 text-lg">Official external resources</h3>
               <ul className="space-y-2 text-sm text-slate-700">
-                <li><Link href="/" className="hover:underline hover:text-gov-blue">How government works</Link></li>
-                <li><Link href="/" className="hover:underline hover:text-gov-blue">Departments</Link></li>
-                <li><Link href="/" className="hover:underline hover:text-gov-blue">Worldwide</Link></li>
+                <li><a href="https://www.gov.uk/browse/driving/driving-licences" className="hover:underline hover:text-gov-blue">Driving licence services on GOV.UK</a></li>
+                <li><a href="https://www.gov.uk/contact-the-dvla" className="hover:underline hover:text-gov-blue">Contact DVLA directly</a></li>
               </ul>
             </div>
           </div>
           <div className="border-t border-slate-300 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-slate-600">
             <div className="flex items-center gap-2">
               <ShieldCheck className="h-6 w-6 text-gov-blue" />
-              <span>All content is available under the Open Government Licence v3.0, except where otherwise stated</span>
+              <span>UK Licence Assistance is an independent service, not affiliated with DVLA.</span>
             </div>
             <div className="font-bold">
-              © Crown copyright
+              UK Licence Assistance
             </div>
           </div>
         </div>

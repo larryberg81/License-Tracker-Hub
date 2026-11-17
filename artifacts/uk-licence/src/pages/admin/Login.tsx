@@ -25,8 +25,8 @@ export function AdminLogin() {
           localStorage.setItem('admin_token', res.token);
           setLocation('/admin/dashboard');
         },
-        onError: () => {
-          setError('Invalid username or password.');
+        onError: (error) => {
+          setError(error instanceof Error ? error.message : 'Sign-in failed. Please try again.');
         }
       }
     );
@@ -41,8 +41,8 @@ export function AdminLogin() {
       >
         <div className="flex flex-col items-center mb-8 text-white">
           <ShieldCheck className="h-16 w-16 text-gov-green mb-4" />
-          <h1 className="text-3xl font-black tracking-tight">GOV.UK Admin Hub</h1>
-          <p className="text-slate-400 mt-2">Authorised personnel only</p>
+          <h1 className="text-3xl font-black tracking-tight">Licence Assistance Admin</h1>
+          <p className="text-slate-400 mt-2">Independent service · authorised staff only</p>
         </div>
 
         <Card className="border-0 shadow-2xl overflow-hidden">
