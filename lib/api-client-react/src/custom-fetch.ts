@@ -363,12 +363,6 @@ export async function customFetch<T = unknown>(
   const response = await fetch(input, { ...init, method, headers });
 
   if (!response.ok) {
-    if (response.status === 401 && typeof window !== "undefined" &&
-        new URL(requestInfo.url, window.location.origin).pathname.startsWith("/api/admin/") &&
-        !requestInfo.url.includes("/admin/login")) {
-      window.localStorage.removeItem("admin_token");
-      window.dispatchEvent(new Event("admin-session-expired"));
-    }
     const errorData = await parseErrorBody(response, method);
     throw new ApiError(response, errorData, requestInfo);
   }

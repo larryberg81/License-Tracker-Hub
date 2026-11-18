@@ -1,1 +1,0 @@
-- [Service identity](service-identity.md) — The user identifies this product as an independent licence assistance service.

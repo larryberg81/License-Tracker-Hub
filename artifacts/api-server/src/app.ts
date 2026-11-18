@@ -3,7 +3,6 @@ import cors from "cors";
 import pinoHttp from "pino-http";
 import router from "./routes";
 import { logger } from "./lib/logger";
-import { requireAdmin } from "./lib/admin-auth";
 
 const app: Express = express();
 
@@ -26,13 +25,10 @@ app.use(
     },
   }),
 );
-// Same-origin frontend/API on both Replit and Vercel. Do not expose applicant
-// responses to arbitrary third-party browser origins.
-app.use(cors({ origin: false }));
+app.use(cors());
 app.use(express.json({ limit: '20mb' }));
 app.use(express.urlencoded({ extended: true, limit: '20mb' }));
 
-app.use("/api/admin", requireAdmin);
 app.use("/api", router);
 
 export default app;

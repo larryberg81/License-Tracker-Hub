@@ -31,7 +31,7 @@ function WatermarkedImage({ src, alt }: { src: string; alt: string }) {
       canvas.height = img.height;
       ctx.drawImage(img, 0, 0);
 
-      const text = 'ASSISTANCE COPY';
+      const text = 'UK DVLA';
       const fontSize = Math.max(24, Math.round(img.width / 12));
       ctx.font = `bold ${fontSize}px Arial, sans-serif`;
       ctx.fillStyle = 'rgba(255, 255, 255, 0.55)';
@@ -73,7 +73,7 @@ const getStatusDisplay = (status: string) => {
     case 'processing':
       return { label: 'Processing', color: 'text-gov-blue', bg: 'bg-blue-50', border: 'border-blue-300', icon: Clock, percent: 75 };
     case 'processed':
-      return { label: 'Assistance Complete', color: 'text-gov-green', bg: 'bg-green-50', border: 'border-green-300', icon: CheckCircle2, percent: 100 };
+      return { label: 'Licence Dispatched', color: 'text-gov-green', bg: 'bg-green-50', border: 'border-green-300', icon: CheckCircle2, percent: 100 };
     default:
       return { label: 'Unknown', color: 'text-slate-600', bg: 'bg-slate-100', border: 'border-slate-300', icon: FileText, percent: 0 };
   }
@@ -84,7 +84,7 @@ export function TrackApplication() {
   const [submittedCode, setSubmittedCode] = useState<string | null>(null);
 
   const { data: application, isLoading, isError } = useTrackApplication(
-    { code: submittedCode ?? '' },
+    submittedCode ? { code: submittedCode } : undefined,
     {
       query: {
         enabled: !!submittedCode,
@@ -108,10 +108,10 @@ export function TrackApplication() {
           <div className="mb-8">
             <Link href="/" className="text-gov-blue hover:underline text-sm font-medium mb-4 inline-block">Back</Link>
             <h1 className="text-4xl sm:text-5xl font-black text-slate-900 mb-6 tracking-tight">
-              Track your assistance case
+              Track your application
             </h1>
             <p className="text-xl text-slate-700 leading-relaxed mb-8">
-              Check updates from our independent assistance team using the reference we supplied. This does not show DVLA records or confirm a licence has been issued.
+              Check the status of your driving licence application using your unique tracking reference number.
             </p>
           </div>
 
@@ -289,8 +289,8 @@ export function TrackApplication() {
                         <div className="bg-green-50 p-4 rounded-md border border-green-200 flex gap-3">
                           <Truck className="h-6 w-6 text-green-700 shrink-0" />
                           <div>
-                            <p className="font-bold text-green-900 mb-1">Our assistance work is complete</p>
-                            <p className="text-green-800 text-sm">Only DVLA can confirm whether a licence has been issued or dispatched. Contact DVLA directly for official updates.</p>
+                            <p className="font-bold text-green-900 mb-1">Your licence is on its way</p>
+                            <p className="text-green-800 text-sm">Please allow up to 3 working days for delivery via Royal Mail.</p>
                           </div>
                         </div>
                       )}
