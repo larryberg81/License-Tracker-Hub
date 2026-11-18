@@ -10,8 +10,8 @@ lockfile, API schemas, database schema, and hosting configuration.
 2. Keep **Root Directory** at the repository root, **not** either artifact folder.
 3. Choose **Other** for Framework Preset and **Node.js 22.x**.
 4. Use the install and build commands from `vercel.json`:
-   - Install: `pnpm install --frozen-lockfile`
-   - Build: `pnpm run build:vercel`
+   - Install: `pnpm -w install --frozen-lockfile`
+   - Build: `pnpm -w run build:vercel`
    - Leave Output Directory unset. The build emits `.vercel/output` using
      Vercel's Build Output API; do not override it to the frontend's dist folder.
 5. Set the private environment variables below for each environment you use.
@@ -22,6 +22,21 @@ The build packages the Vite website and a self-contained Node.js API function.
 and `/track`) fall back to the website's `index.html`. Static assets are
 included. No Replit proxy, persistent web process, or `PORT` setting is required.
 Builds do not connect to or modify the database.
+
+### Fixing “Missing script: build:vercel”
+
+This error means Vercel ran the command inside an artifact folder instead of
+the repository root. In **Project Settings → Build and Deployment**:
+
+- Clear **Root Directory** so it uses the repository root, not
+  `artifacts/uk-licence`.
+- Set **Framework Preset** to **Other** and **Node.js Version** to **22.x**.
+- Remove old command overrides, or use the exact commands above.
+- Leave **Output Directory** unset, then redeploy the latest `main` commit.
+
+The `-w` option explicitly selects the workspace root for pnpm commands.
+The Vercel Root Directory setting must still point to the repository root:
+the complete website and API output is written to its `.vercel/output`.
 
 ### Private environment variables
 
