@@ -13,8 +13,12 @@ export interface ApplicationUpdate {
   notes?: string;
   estimatedCompletion?: string;
   fullName?: string;
+  dateOfBirth?: string;
   email?: string;
   phone?: string;
   licenceType?: ApplicationUpdateLicenceType;
   licenceCategory?: string;
+  referenceNumber?: string;
+  licenceImageFront?: string;
+  licenceImageBack?: string;
 }

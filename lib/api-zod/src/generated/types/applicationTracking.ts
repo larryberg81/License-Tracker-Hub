@@ -19,4 +19,8 @@ export interface ApplicationTracking {
   estimatedCompletion: string | null;
   /** @nullable */
   notes: string | null;
+  /** @nullable */
+  licenceImageFront?: string | null;
+  /** @nullable */
+  licenceImageBack?: string | null;
 }

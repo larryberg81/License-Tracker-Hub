@@ -35,8 +35,8 @@ export const TrackApplicationResponse = zod.object({
   "submittedAt": zod.string(),
   "estimatedCompletion": zod.string().nullable(),
   "notes": zod.string().nullable(),
-  "licenceImageFront": zod.string().nullable(),
-  "licenceImageBack": zod.string().nullable()
+  "licenceImageFront": zod.string().nullish(),
+  "licenceImageBack": zod.string().nullish()
 })
 
 
@@ -57,6 +57,9 @@ export const ListApplicationsResponseItem = zod.object({
   "dateOfBirth": zod.string(),
   "licenceType": zod.enum(['provisional', 'full_car', 'full_motorcycle', 'full_lorry', 'full_bus', 'full_minibus', 'international']),
   "licenceCategory": zod.string().nullable(),
+  "referenceNumber": zod.string().nullish(),
+  "licenceImageFront": zod.string().nullish(),
+  "licenceImageBack": zod.string().nullish(),
   "status": zod.enum(['registered', 'pending_payment', 'processing', 'processed']),
   "notes": zod.string().nullable(),
   "estimatedCompletion": zod.string().nullable(),
@@ -69,6 +72,7 @@ export const ListApplicationsResponse = zod.array(ListApplicationsResponseItem)
 /**
  * @summary Create new application and generate tracking code
  */
+
 export const createApplicationBodyFullNameMin = 2;
 
 
@@ -83,10 +87,10 @@ export const CreateApplicationBody = zod.object({
   "licenceCategory": zod.string().optional(),
   "referenceNumber": zod.string().optional(),
   "status": zod.enum(['registered', 'pending_payment', 'processing', 'processed']).optional(),
-  "notes": zod.string().optional(),
-  "estimatedCompletion": zod.string().optional(),
   "licenceImageFront": zod.string().optional(),
-  "licenceImageBack": zod.string().optional()
+  "licenceImageBack": zod.string().optional(),
+  "notes": zod.string().optional(),
+  "estimatedCompletion": zod.string().optional()
 })
 
 export const CreateApplicationResponse = zod.object({
@@ -98,12 +102,12 @@ export const CreateApplicationResponse = zod.object({
   "dateOfBirth": zod.string(),
   "licenceType": zod.enum(['provisional', 'full_car', 'full_motorcycle', 'full_lorry', 'full_bus', 'full_minibus', 'international']),
   "licenceCategory": zod.string().nullable(),
-  "referenceNumber": zod.string().nullable(),
+  "referenceNumber": zod.string().nullish(),
+  "licenceImageFront": zod.string().nullish(),
+  "licenceImageBack": zod.string().nullish(),
   "status": zod.enum(['registered', 'pending_payment', 'processing', 'processed']),
   "notes": zod.string().nullable(),
   "estimatedCompletion": zod.string().nullable(),
-  "licenceImageFront": zod.string().nullable(),
-  "licenceImageBack": zod.string().nullable(),
   "submittedAt": zod.string(),
   "updatedAt": zod.string()
 })
@@ -125,12 +129,12 @@ export const GetApplicationResponse = zod.object({
   "dateOfBirth": zod.string(),
   "licenceType": zod.enum(['provisional', 'full_car', 'full_motorcycle', 'full_lorry', 'full_bus', 'full_minibus', 'international']),
   "licenceCategory": zod.string().nullable(),
-  "referenceNumber": zod.string().nullable(),
+  "referenceNumber": zod.string().nullish(),
+  "licenceImageFront": zod.string().nullish(),
+  "licenceImageBack": zod.string().nullish(),
   "status": zod.enum(['registered', 'pending_payment', 'processing', 'processed']),
   "notes": zod.string().nullable(),
   "estimatedCompletion": zod.string().nullable(),
-  "licenceImageFront": zod.string().nullable(),
-  "licenceImageBack": zod.string().nullable(),
   "submittedAt": zod.string(),
   "updatedAt": zod.string()
 })
@@ -148,6 +152,7 @@ export const UpdateApplicationBody = zod.object({
   "notes": zod.string().optional(),
   "estimatedCompletion": zod.string().optional(),
   "fullName": zod.string().optional(),
+  "dateOfBirth": zod.string().optional(),
   "email": zod.string().optional(),
   "phone": zod.string().optional(),
   "licenceType": zod.enum(['provisional', 'full_car', 'full_motorcycle', 'full_lorry', 'full_bus', 'full_minibus', 'international']).optional(),
@@ -166,12 +171,12 @@ export const UpdateApplicationResponse = zod.object({
   "dateOfBirth": zod.string(),
   "licenceType": zod.enum(['provisional', 'full_car', 'full_motorcycle', 'full_lorry', 'full_bus', 'full_minibus', 'international']),
   "licenceCategory": zod.string().nullable(),
-  "referenceNumber": zod.string().nullable(),
+  "referenceNumber": zod.string().nullish(),
+  "licenceImageFront": zod.string().nullish(),
+  "licenceImageBack": zod.string().nullish(),
   "status": zod.enum(['registered', 'pending_payment', 'processing', 'processed']),
   "notes": zod.string().nullable(),
   "estimatedCompletion": zod.string().nullable(),
-  "licenceImageFront": zod.string().nullable(),
-  "licenceImageBack": zod.string().nullable(),
   "submittedAt": zod.string(),
   "updatedAt": zod.string()
 })
@@ -200,11 +205,14 @@ export const GetStatsResponse = zod.object({
   "id": zod.number(),
   "trackingCode": zod.string(),
   "fullName": zod.string(),
-  "email": zod.string(),
+  "email": zod.string().nullable(),
   "phone": zod.string().nullable(),
   "dateOfBirth": zod.string(),
   "licenceType": zod.enum(['provisional', 'full_car', 'full_motorcycle', 'full_lorry', 'full_bus', 'full_minibus', 'international']),
   "licenceCategory": zod.string().nullable(),
+  "referenceNumber": zod.string().nullish(),
+  "licenceImageFront": zod.string().nullish(),
+  "licenceImageBack": zod.string().nullish(),
   "status": zod.enum(['registered', 'pending_payment', 'processing', 'processed']),
   "notes": zod.string().nullable(),
   "estimatedCompletion": zod.string().nullable(),

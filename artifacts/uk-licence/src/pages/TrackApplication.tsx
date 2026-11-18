@@ -84,7 +84,7 @@ export function TrackApplication() {
   const [submittedCode, setSubmittedCode] = useState<string | null>(null);
 
   const { data: application, isLoading, isError } = useTrackApplication(
-    submittedCode ? { code: submittedCode } : undefined,
+    { code: submittedCode ?? '' },
     {
       query: {
         enabled: !!submittedCode,

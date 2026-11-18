@@ -1,0 +1,1 @@
+- [Package-manager bootstrap](package-manager-bootstrap.md) — check installed pnpm before changing its packageManager pin; mismatches can trigger recursive self-installation here.

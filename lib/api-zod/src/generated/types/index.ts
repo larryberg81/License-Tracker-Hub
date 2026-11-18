@@ -9,6 +9,7 @@
 export * from './application';
 export * from './applicationInput';
 export * from './applicationInputLicenceType';
+export * from './applicationInputStatus';
 export * from './applicationLicenceType';
 export * from './applicationStatus';
 export * from './applicationTracking';

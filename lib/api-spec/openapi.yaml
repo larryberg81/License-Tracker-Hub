@@ -239,6 +239,10 @@ components:
           type: ["string", "null"]
         notes:
           type: ["string", "null"]
+        licenceImageFront:
+          type: ["string", "null"]
+        licenceImageBack:
+          type: ["string", "null"]
       required:
         - trackingCode
         - fullName
@@ -260,7 +264,7 @@ components:
         fullName:
           type: string
         email:
-          type: string
+          type: ["string", "null"]
         phone:
           type: ["string", "null"]
         dateOfBirth:
@@ -269,6 +273,12 @@ components:
           type: string
           enum: [provisional, full_car, full_motorcycle, full_lorry, full_bus, full_minibus, international]
         licenceCategory:
+          type: ["string", "null"]
+        referenceNumber:
+          type: ["string", "null"]
+        licenceImageFront:
+          type: ["string", "null"]
+        licenceImageBack:
           type: ["string", "null"]
         status:
           type: string
@@ -299,6 +309,9 @@ components:
     ApplicationInput:
       type: object
       properties:
+        trackingCode:
+          type: string
+          minLength: 1
         fullName:
           type: string
           minLength: 2
@@ -313,13 +326,22 @@ components:
           enum: [provisional, full_car, full_motorcycle, full_lorry, full_bus, full_minibus, international]
         licenceCategory:
           type: string
+        referenceNumber:
+          type: string
+        status:
+          type: string
+          enum: [registered, pending_payment, processing, processed]
+        licenceImageFront:
+          type: string
+        licenceImageBack:
+          type: string
         notes:
           type: string
         estimatedCompletion:
           type: string
       required:
+        - trackingCode
         - fullName
-        - email
         - dateOfBirth
         - licenceType
 
@@ -335,6 +357,8 @@ components:
           type: string
         fullName:
           type: string
+        dateOfBirth:
+          type: string
         email:
           type: string
         phone:
@@ -343,6 +367,12 @@ components:
           type: string
           enum: [provisional, full_car, full_motorcycle, full_lorry, full_bus, full_minibus, international]
         licenceCategory:
+          type: string
+        referenceNumber:
+          type: string
+        licenceImageFront:
+          type: string
+        licenceImageBack:
           type: string
 
     Stats:

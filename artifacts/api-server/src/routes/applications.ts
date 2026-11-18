@@ -63,6 +63,10 @@ const LICENCE_TYPE_LABELS: Record<string, string> = {
 
 // Public tracking endpoint
 router.get("/applications/track", async (req, res): Promise<void> => {
+  if (typeof req.query.code !== "string" || !req.query.code.trim()) {
+    res.status(400).json({ error: "A tracking code is required" });
+    return;
+  }
   const parsed = TrackApplicationQueryParams.safeParse(req.query);
   if (!parsed.success) {
     res.status(400).json({ error: "Invalid query parameters" });

@@ -36,9 +36,9 @@ export interface ApplicationTracking {
   /** @nullable */
   notes: string | null;
   /** @nullable */
-  licenceImageFront: string | null;
+  licenceImageFront?: string | null;
   /** @nullable */
-  licenceImageBack: string | null;
+  licenceImageBack?: string | null;
 }
 
 export type ApplicationLicenceType = typeof ApplicationLicenceType[keyof typeof ApplicationLicenceType];
@@ -77,16 +77,16 @@ export interface Application {
   /** @nullable */
   licenceCategory: string | null;
   /** @nullable */
-  referenceNumber: string | null;
+  referenceNumber?: string | null;
+  /** @nullable */
+  licenceImageFront?: string | null;
+  /** @nullable */
+  licenceImageBack?: string | null;
   status: ApplicationStatus;
   /** @nullable */
   notes: string | null;
   /** @nullable */
   estimatedCompletion: string | null;
-  /** @nullable */
-  licenceImageFront: string | null;
-  /** @nullable */
-  licenceImageBack: string | null;
   submittedAt: string;
   updatedAt: string;
 }
@@ -104,7 +104,19 @@ export const ApplicationInputLicenceType = {
   international: 'international',
 } as const;
 
+export type ApplicationInputStatus = typeof ApplicationInputStatus[keyof typeof ApplicationInputStatus];
+
+
+export const ApplicationInputStatus = {
+  registered: 'registered',
+  pending_payment: 'pending_payment',
+  processing: 'processing',
+  processed: 'processed',
+} as const;
+
 export interface ApplicationInput {
+  /** @minLength 1 */
+  trackingCode: string;
   /** @minLength 2 */
   fullName: string;
   email?: string;
@@ -113,10 +125,11 @@ export interface ApplicationInput {
   licenceType: ApplicationInputLicenceType;
   licenceCategory?: string;
   referenceNumber?: string;
-  notes?: string;
-  estimatedCompletion?: string;
+  status?: ApplicationInputStatus;
   licenceImageFront?: string;
   licenceImageBack?: string;
+  notes?: string;
+  estimatedCompletion?: string;
 }
 
 export type ApplicationUpdateStatus = typeof ApplicationUpdateStatus[keyof typeof ApplicationUpdateStatus];
@@ -147,6 +160,7 @@ export interface ApplicationUpdate {
   notes?: string;
   estimatedCompletion?: string;
   fullName?: string;
+  dateOfBirth?: string;
   email?: string;
   phone?: string;
   licenceType?: ApplicationUpdateLicenceType;

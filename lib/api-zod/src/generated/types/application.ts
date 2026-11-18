@@ -12,13 +12,20 @@ export interface Application {
   id: number;
   trackingCode: string;
   fullName: string;
-  email: string;
+  /** @nullable */
+  email: string | null;
   /** @nullable */
   phone: string | null;
   dateOfBirth: string;
   licenceType: ApplicationLicenceType;
   /** @nullable */
   licenceCategory: string | null;
+  /** @nullable */
+  referenceNumber?: string | null;
+  /** @nullable */
+  licenceImageFront?: string | null;
+  /** @nullable */
+  licenceImageBack?: string | null;
   status: ApplicationStatus;
   /** @nullable */
   notes: string | null;
