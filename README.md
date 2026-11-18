@@ -10,7 +10,7 @@ lockfile, API schemas, database schema, and hosting configuration.
 2. Keep **Root Directory** at the repository root, **not** either artifact folder.
 3. Choose **Other** for Framework Preset and **Node.js 22.x**.
 4. Use the install and build commands from `vercel.json`:
-   - Install: `pnpm -w install --frozen-lockfile`
+   - Install: `pnpm -r install --frozen-lockfile --prod=false`
    - Build: `pnpm -w run build:vercel`
    - Leave Output Directory unset. The build emits `.vercel/output` using
      Vercel's Build Output API; do not override it to the frontend's dist folder.
@@ -34,7 +34,10 @@ the repository root. In **Project Settings → Build and Deployment**:
 - Remove old command overrides, or use the exact commands above.
 - Leave **Output Directory** unset, then redeploy the latest `main` commit.
 
-The `-w` option explicitly selects the workspace root for pnpm commands.
+The build's `-w` option explicitly selects the workspace root.
+The install's `-r` option installs all workspace packages, and `--prod=false`
+includes required build tools such as Vite even in a production environment.
+Do not use `-w install`: it installs only root dependencies and skips the app.
 The Vercel Root Directory setting must still point to the repository root:
 the complete website and API output is written to its `.vercel/output`.
 
